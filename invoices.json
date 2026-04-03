@@ -1,0 +1,31 @@
+[
+  {
+    "consecutivo": 1711,
+    "tipo_comprobante": 2,
+    "identificacion_tercero": "8028804",
+    "fecha_elaboracion": "2026-04-02",
+    "identificacion_vendedor": "BE CRITICAL COFFEE S.A.S",
+    "items": [
+      {
+        "sku": "SURU",
+        "producto": "Sudan Rumé Natural",
+        "presentacion": "340g",
+        "cantidad": 3,
+        "valor_unitario": 285.29411764705884,
+        "total": 855.8823529411766
+      },
+      {
+        "sku": "BHO72",
+        "producto": "Blend Honey72h",
+        "presentacion": "340g",
+        "cantidad": 3,
+        "valor_unitario": 155.88235294117646,
+        "total": 467.6470588235294
+      }
+    ],
+    "forma_pago": {
+      "codigo": 1,
+      "valor": 1323.5294117647059
+    }
+  }
+]
