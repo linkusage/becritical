@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Siigo · Importar Terceros</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- SheetJS for xlsx generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #222535;
+  --surface3: #2a2e42;
+  --border: #2e3248;
+  --border2: #3d4262;
+  --accent: #4f6ef7;
+  --accent2: #7c3aed;
+  --green: #10b981;
+  --red: #ef4444;
+  --yellow: #f59e0b;
+  --text: #e8eaf6;
+  --text2: #8b90b5;
+  --text3: #4a4f72;
+  --r: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* Header */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.logo {
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em;
+}
+.logo-icon {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+}
+.logo span { color: var(--text2); font-weight: 500; font-size: .85rem; margin-left: 4px; }
+.header-right { display: flex; gap: .75rem; align-items: center; }
+
+/* Main layout */
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+}
+
+/* Page title */
+.page-title {
+  margin-bottom: 2rem;
+}
+.page-title h1 {
+  font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--text), var(--accent));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: .3rem;
+}
+.page-title p { font-size: .875rem; color: var(--text2); }
+
+/* Tab pills */
+.tabs {
+  display: flex;
+  gap: .5rem;
+  margin-bottom: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 5px;
+  width: fit-content;
+}
+.tab {
+  padding: .45rem 1.25rem;
+  border-radius: 7px;
+  font-size: .825rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--text2);
+  transition: all .2s;
+}
+.tab.active {
+  background: var(--accent);
+  color: white;
+}
+
+/* Panel */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Form card */
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+.form-card-header {
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: .625rem;
+  font-weight: 700;
+  font-size: .9rem;
+}
+.form-card-header .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+.form-card-body {
+  padding: 1.5rem;
+}
+
+/* Grid */
+.fg {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.1rem;
+}
+.fg-3 { grid-template-columns: 1fr 1fr 1fr; }
+.fg-1 { grid-template-columns: 1fr; }
+.span2 { grid-column: span 2; }
+
+/* Fields */
+.field { display: flex; flex-direction: column; gap: .35rem; }
+label {
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--text2);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: .35rem;
+}
+label .req { color: var(--red); }
+input, select {
+  font-family: 'Sora', sans-serif;
+  font-size: .875rem;
+  padding: .6rem .875rem;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  color: var(--text);
+  outline: none;
+  transition: border-color .18s, box-shadow .18s, background .18s;
+  width: 100%;
+}
+input:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(79,110,247,.15);
+  background: var(--surface3);
+}
+input::placeholder { color: var(--text3); }
+select option { background: var(--surface2); }
+
+/* Hint */
+.hint { font-size: .7rem; color: var(--text3); margin-top: .1rem; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: .5rem;
+  padding: .6rem 1.25rem;
+  border-radius: 9px;
+  font-family: 'Sora', sans-serif;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all .18s;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { background: #3d5ce5; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(79,110,247,.35); }
+.btn-success { background: var(--green); color: white; }
+.btn-success:hover { background: #0da271; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(16,185,129,.35); }
+.btn-ghost { background: var(--surface2); color: var(--text2); border: 1.5px solid var(--border); }
+.btn-ghost:hover { background: var(--surface3); color: var(--text); }
+.btn-danger-soft { background: transparent; color: #f87171; border: 1.5px solid #3b1f1f; padding: .4rem .75rem; font-size: .78rem; }
+.btn-danger-soft:hover { background: #2d1515; }
+.btn-sm { padding: .4rem .875rem; font-size: .78rem; }
+
+.actions {
+  display: flex;
+  gap: .75rem;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 1rem 1.5rem;
+  background: var(--surface2);
+  border-top: 1px solid var(--border);
+}
+
+/* Client list table */
+.client-table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: .75rem;
+}
+.table-toolbar h2 { font-size: .925rem; font-weight: 700; }
+.count-badge {
+  background: var(--accent);
+  color: white;
+  font-size: .7rem;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 20px;
+  margin-left: .5rem;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+thead th {
+  font-size: .68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--text3);
+  padding: .65rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+  white-space: nowrap;
+}
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background .15s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surface2); }
+tbody td {
+  padding: .75rem 1rem;
+  font-size: .825rem;
+  vertical-align: middle;
+}
+.td-mono { font-family: 'JetBrains Mono', monospace; font-size: .75rem; color: var(--text2); }
+.td-name { font-weight: 600; color: var(--text); }
+.td-email { color: var(--text2); font-size: .78rem; }
+.avatar-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: .75rem;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  flex-shrink: 0;
+}
+.td-with-avatar { display: flex; align-items: center; gap: .625rem; }
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text3);
+}
+.empty-icon { font-size: 2.5rem; margin-bottom: .75rem; }
+.empty h3 { font-size: .9rem; font-weight: 700; color: var(--text2); margin-bottom: .3rem; }
+.empty p { font-size: .8rem; }
+
+/* Toast */
+.toasts {
+  position: fixed; bottom: 1.5rem; right: 1.5rem;
+  display: flex; flex-direction: column; gap: .5rem;
+  z-index: 1000;
+}
+.toast {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: .75rem 1.1rem;
+  border-radius: 10px;
+  font-size: .825rem;
+  font-weight: 500;
+  display: flex; align-items: center; gap: .5rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  animation: tin .3s ease;
+  max-width: 300px;
+}
+.toast.ok { border-left: 3px solid var(--green); }
+.toast.err { border-left: 3px solid var(--red); }
+@keyframes tin { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* Siigo mapping info */
+.mapping-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  font-size: .78rem;
+  color: var(--text2);
+  margin-bottom: 1.5rem;
+}
+.mapping-box strong { color: var(--accent); }
+.mapping-row { display: flex; justify-content: space-between; padding: .25rem 0; border-bottom: 1px solid var(--border); }
+.mapping-row:last-child { border-bottom: none; }
+.mapping-row .from { color: var(--text); font-weight: 600; }
+.mapping-row .arrow { color: var(--text3); }
+.mapping-row .to { font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: var(--green); }
+
+/* Export section */
+.export-card {
+  background: linear-gradient(135deg, rgba(79,110,247,.1), rgba(124,58,237,.1));
+  border: 1px solid rgba(79,110,247,.3);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.export-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: .3rem; }
+.export-card p { font-size: .825rem; color: var(--text2); }
+
+@media (max-width: 700px) {
+  .fg { grid-template-columns: 1fr; }
+  .fg-3 { grid-template-columns: 1fr; }
+  .span2 { grid-column: span 1; }
+  .container { padding: 1.25rem 1rem; }
+  header { padding: 0 1rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">📊</div>
+    Siigo Terceros
+    <span>· Importación Colombia</span>
+  </div>
+  <div class="header-right">
+    <button class="btn btn-sm btn-ghost" onclick="switchPanel('list')">📋 Ver lista</button>
+    <button class="btn btn-sm btn-primary" onclick="switchPanel('form')">➕ Nuevo</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="page-title">
+    <h1>Importar Terceros a Siigo</h1>
+    <p>Ingresa los datos y descarga el archivo <strong>.xlsx</strong> listo para cargar en Siigo Nube Colombia</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tab-form" onclick="switchPanel('form')">✏️ Agregar tercero</button>
+    <button class="tab" id="tab-list" onclick="switchPanel('list')">👥 Lista (<span id="tab-count">0</span>)</button>
+    <button class="tab" id="tab-export" onclick="switchPanel('export')">📥 Exportar</button>
+  </div>
+
+  <!-- ── FORM PANEL ── -->
+  <div class="panel active" id="panel-form">
+
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="dot"></div>
+        Datos del Tercero
+        <span style="color:var(--text3);font-weight:400;font-size:.78rem;margin-left:auto;">* Campos obligatorios para Siigo</span>
+      </div>
+      <div class="form-card-body">
+
+        <!-- Nombre y documento -->
+        <div class="fg" style="margin-bottom:1.1rem;">
+          <div class="field">
+            <label>Nombre completo <span class="req">*</span></label>
+            <input type="text" id="f-nombre" placeholder="Ej: Juan Carlos Pérez López" autocomplete="off">
+            <span class="hint">Se dividirá en nombres/apellidos automáticamente</span>
+          </div>
+          <div class="field">
+            <label>Cédula / NIT <span class="req">*</span></label>
+            <input type="text" id="f-cedula" placeholder="Ej: 1098765432" autocomplete="off">
+          </div>
+          <div class="field">
+            <label>Tipo identificación <span class="req">*</span></label>
+            <select id="f-tipo-id">
+              <option value="13">CC · Cédula de Ciudadanía</option>
+              <option value="22">CE · Cédula de Extranjería</option>
+              <option value="31">NIT · NIT empresa</option>
+              <option value="41">PA · Pasaporte</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Tipo de tercero <span class="req">*</span></label>
+            <select id="f-tipo">
+              <option value="Es persona">Persona Natural</option>
+              <option value="Empresa">Persona Jurídica</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Contacto -->
+        <div class="fg" style="margin-bottom:1.1rem;">
+          <div class="field span2">
+            <label>Correo electrónico <span class="req">*</span></label>
+            <input type="email" id="f-correo" placeholder="correo@ejemplo.com">
+          </div>
+          <div class="field">
+            <label>Celular / Teléfono <span class="req">*</span></label>
+            <input type="tel" id="f-celular" placeholder="Ej: 3001234567">
+          </div>
+          <div class="field">
+            <label>Indicativo</label>
+            <input type="text" id="f-indicativo" placeholder="57" value="57">
+            <span class="hint">Código de país (57 para Colombia)</span>
+          </div>
+        </div>
+
+        <!-- Ubicación -->
+        <div class="fg" style="margin-bottom:1.1rem;">
+          <div class="field span2">
+            <label>Dirección</label>
+            <input type="text" id="f-direccion" placeholder="Ej: Calle 10 # 20-30">
+          </div>
+          <div class="field">
+            <label>Código país</label>
+            <select id="f-cod-pais">
+              <option value="COL">Colombia</option>
+              <option value="USA">Estados Unidos</option>
+              <option value="CAN">Canadá</option>
+              <option value="GBR">Reino Unido</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Departamento <span class="req">*</span></label>
+            <select id="f-dpto" onchange="onDptoChange()">
+              <option value="">— Seleccionar departamento —</option>
+            </select>
+          </div>
+          <div class="field span2">
+            <label>Ciudad <span class="req">*</span></label>
+            <select id="f-ciudad" onchange="onCiudadChange()" disabled>
+              <option value="">— Primero selecciona un departamento —</option>
+            </select>
+            <span class="hint" id="dane-hint" style="display:none;"></span>
+          </div>
+        </div>
+
+        <!-- Nombre unidad -->
+        <div class="fg">
+          <div class="field span2">
+            <label>Nombre unidad / Empresa / Razón social</label>
+            <input type="text" id="f-unidad" placeholder="Ej: Edificio El Poblado · Unidad 5 (se usará como razón social si es empresa)">
+          </div>
+          <div class="field">
+            <label>Régimen IVA</label>
+            <select id="f-regimen">
+              <option value="0 - No responsable de IVA">No responsable de IVA</option>
+              <option value="2 - Responsable de IVA">Responsable de IVA</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Rol <span class="req">*</span></label>
+            <select id="f-rol">
+              <option value="cliente">Cliente</option>
+              <option value="proveedor">Proveedor</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="clearForm()">🗑 Limpiar</button>
+        <button class="btn btn-primary" onclick="addClient()">✅ Agregar a la lista</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── LIST PANEL ── -->
+  <div class="panel" id="panel-list">
+    <div class="client-table-wrap">
+      <div class="table-toolbar">
+        <div>
+          <span style="font-weight:700;">Terceros agregados</span>
+          <span class="count-badge" id="list-count">0</span>
+        </div>
+        <div style="display:flex;gap:.75rem;">
+          <button class="btn btn-ghost btn-sm" onclick="switchPanel('form')">➕ Agregar</button>
+          <button class="btn btn-success btn-sm" onclick="exportXLSX()">⬇️ Descargar XLSX</button>
+        </div>
+      </div>
+      <div id="table-body">
+        <div class="empty">
+          <div class="empty-icon">👥</div>
+          <h3>Sin terceros aún</h3>
+          <p>Agrega terceros con el formulario</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── EXPORT PANEL ── -->
+  <div class="panel" id="panel-export">
+
+    <div class="mapping-box" style="margin-bottom:1.5rem;">
+      <div style="font-weight:700;color:var(--text);margin-bottom:.75rem;font-size:.85rem;">📋 Mapeo de campos → Siigo Nube</div>
+      <div class="mapping-row"><span class="from">Cédula / NIT</span><span class="arrow">→</span><span class="to">Identificación (Obligatorio)</span></div>
+      <div class="mapping-row"><span class="from">Tipo identificación</span><span class="arrow">→</span><span class="to">Tipo identificación (Obligatorio)</span></div>
+      <div class="mapping-row"><span class="from">Tipo de tercero</span><span class="arrow">→</span><span class="to">Tipo (Obligatorio)</span></div>
+      <div class="mapping-row"><span class="from">Nombre unidad / Razón social</span><span class="arrow">→</span><span class="to">Razón social (Obligatorio)</span></div>
+      <div class="mapping-row"><span class="from">Nombres (parte del nombre)</span><span class="arrow">→</span><span class="to">Nombres del tercero (Obligatorio)</span></div>
+      <div class="mapping-row"><span class="from">Apellidos (parte del nombre)</span><span class="arrow">→</span><span class="to">Apellidos del tercero (Obligatorio)</span></div>
+      <div class="mapping-row"><span class="from">Dirección</span><span class="arrow">→</span><span class="to">Dirección</span></div>
+      <div class="mapping-row"><span class="from">Código país</span><span class="arrow">→</span><span class="to">Código país</span></div>
+      <div class="mapping-row"><span class="from">Código departamento</span><span class="arrow">→</span><span class="to">Código departamento/estado</span></div>
+      <div class="mapping-row"><span class="from">Código ciudad Siigo</span><span class="arrow">→</span><span class="to">Código ciudad</span></div>
+      <div class="mapping-row"><span class="from">Indicativo</span><span class="arrow">→</span><span class="to">Indicativo teléfono principal</span></div>
+      <div class="mapping-row"><span class="from">Celular</span><span class="arrow">→</span><span class="to">Teléfono principal + Teléfono contacto</span></div>
+      <div class="mapping-row"><span class="from">Régimen IVA</span><span class="arrow">→</span><span class="to">Tipo de régimen IVA</span></div>
+      <div class="mapping-row"><span class="from">Nombres (parte del nombre)</span><span class="arrow">→</span><span class="to">Nombres contacto principal</span></div>
+      <div class="mapping-row"><span class="from">Correo</span><span class="arrow">→</span><span class="to">Correo electrónico contacto principal</span></div>
+      <div class="mapping-row"><span class="from">Cliente / Proveedor</span><span class="arrow">→</span><span class="to">Clientes / Proveedor</span></div>
+    </div>
+
+    <div class="export-card">
+      <div>
+        <h3>📥 Descargar archivo para Siigo</h3>
+        <p>Genera el <strong>.xlsx</strong> con exactamente las columnas del template de Siigo Nube Colombia, listo para importar directamente.</p>
+        <p style="margin-top:.4rem;font-size:.75rem;color:var(--text3);">Terceros registrados: <strong id="export-count" style="color:var(--green);">0</strong></p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.75rem;align-items:flex-end;">
+        <button class="btn btn-success" onclick="exportXLSX()">⬇️ Descargar XLSX Siigo</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearAll()">🗑 Limpiar todo</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────────
+let clients = JSON.parse(localStorage.getItem('siigo_clients') || '[]');
+
+// ─── Panel switch ─────────────────────────────────────────────────────────────
+function switchPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+  if (id === 'list') renderTable();
+  if (id === 'export') document.getElementById('export-count').textContent = clients.length;
+}
+
+// ─── Name split helper ────────────────────────────────────────────────────────
+function splitName(fullName) {
+  const parts = fullName.trim().split(/\s+/);
+  if (parts.length === 1) return { nombres: parts[0], apellidos: '' };
+  if (parts.length === 2) return { nombres: parts[0], apellidos: parts[1] };
+  if (parts.length === 3) return { nombres: parts[0], apellidos: parts.slice(1).join(' ') };
+  // 4+ words: first 2 = nombres, last 2 = apellidos
+  return { nombres: parts.slice(0, 2).join(' '), apellidos: parts.slice(2).join(' ') };
+}
+
+// ─── Add client ───────────────────────────────────────────────────────────────
+function addClient() {
+  const nombre = document.getElementById('f-nombre').value.trim();
+  const cedula = document.getElementById('f-cedula').value.trim();
+  const correo = document.getElementById('f-correo').value.trim();
+  const celular = document.getElementById('f-celular').value.trim();
+
+  if (!nombre) { toast('El nombre completo es obligatorio', 'err'); return; }
+  if (!cedula) { toast('La cédula / NIT es obligatoria', 'err'); return; }
+  if (!correo) { toast('El correo es obligatorio', 'err'); return; }
+  if (!celular) { toast('El celular es obligatorio', 'err'); return; }
+
+  const unidad = document.getElementById('f-unidad').value.trim();
+  const { nombres, apellidos } = splitName(nombre);
+  const tipoId = document.getElementById('f-tipo-id').value;
+  const tipo = document.getElementById('f-tipo').value;
+  const razonSocial = tipo === 'Empresa' ? (unidad || nombre) : nombre;
+
+  const client = {
+    cedula,
+    tipoId,
+    tipo,
+    razonSocial,
+    nombres,
+    apellidos,
+    direccion: document.getElementById('f-direccion').value.trim(),
+    codPais: document.getElementById('f-cod-pais').value || 'COL',
+    codDpto: (document.getElementById('f-dpto').selectedOptions[0]?.dataset.code || ''),
+    codCiudad: (document.getElementById('f-ciudad').value || ''),
+    indicativo: document.getElementById('f-indicativo').value.trim() || '57',
+    celular,
+    extension: '',
+    regimen: document.getElementById('f-regimen').value,
+    nombreContacto: nombres,
+    apellidoContacto: apellidos,
+    indicativoContacto: document.getElementById('f-indicativo').value.trim() || '57',
+    celularContacto: celular,
+    extensionContacto: '',
+    correo,
+    esCliente: document.getElementById('f-rol').value === 'cliente' ? 'SI' : 'NO',
+    esProveedor: document.getElementById('f-rol').value === 'proveedor' ? 'SI' : 'NO',
+    // display only
+    nombreCompleto: nombre,
+    ciudad: document.getElementById('f-ciudad').selectedOptions[0]?.text || '',
+    unidad,
+  };
+
+  clients.push(client);
+  localStorage.setItem('siigo_clients', JSON.stringify(clients));
+  updateCounts();
+  toast(`✅ ${nombre} agregado correctamente`, 'ok');
+  clearForm();
+}
+
+// ─── Clear form ───────────────────────────────────────────────────────────────
+function clearForm() {
+  ['f-nombre','f-cedula','f-correo','f-celular','f-direccion','f-unidad']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-indicativo').value = '57';
+  document.getElementById('f-cod-pais').value = 'COL';
+  document.getElementById('f-tipo-id').value = '13';
+  document.getElementById('f-tipo').value = 'Es persona';
+  document.getElementById('f-regimen').value = '0 - No responsable de IVA';
+  document.getElementById('f-rol').value = 'cliente';
+  document.getElementById('f-dpto').value = '';
+  const ciudadSel = document.getElementById('f-ciudad');
+  ciudadSel.innerHTML = '<option value="">— Primero selecciona un departamento —</option>';
+  ciudadSel.disabled = true;
+  document.getElementById('dane-hint').style.display = 'none';
+}
+
+// ─── Delete client ────────────────────────────────────────────────────────────
+function deleteClient(idx) {
+  clients.splice(idx, 1);
+  localStorage.setItem('siigo_clients', JSON.stringify(clients));
+  updateCounts();
+  renderTable();
+  toast('Tercero eliminado', 'ok');
+}
+
+// ─── Clear all ────────────────────────────────────────────────────────────────
+function clearAll() {
+  if (!confirm('¿Eliminar todos los terceros de la lista?')) return;
+  clients = [];
+  localStorage.setItem('siigo_clients', JSON.stringify(clients));
+  updateCounts();
+  renderTable();
+  toast('Lista limpiada', 'ok');
+}
+
+// ─── Render table ─────────────────────────────────────────────────────────────
+function renderTable() {
+  const body = document.getElementById('table-body');
+  if (!clients.length) {
+    body.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><h3>Sin terceros aún</h3><p>Agrega terceros con el formulario</p></div>';
+    return;
+  }
+  body.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Tercero</th>
+          <th>Cédula / NIT</th>
+          <th>Correo</th>
+          <th>Celular</th>
+          <th>Ciudad</th>
+          <th>Rol</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${clients.map((c, i) => `
+          <tr>
+            <td>
+              <div class="td-with-avatar">
+                <div class="avatar-pill">${c.nombreCompleto.charAt(0).toUpperCase()}</div>
+                <div>
+                  <div class="td-name">${c.nombreCompleto}</div>
+                  ${c.unidad ? `<div class="td-email">${c.unidad}</div>` : ''}
+                </div>
+              </div>
+            </td>
+            <td class="td-mono">${c.cedula} <span style="color:var(--text3);font-size:.65rem;">${c.tipoId}</span></td>
+            <td class="td-email">${c.correo}</td>
+            <td class="td-mono">${c.celular}</td>
+            <td style="font-size:.8rem;color:var(--text2);">${c.ciudad || '—'}</td>
+            <td>
+              ${c.esCliente ? '<span style="background:rgba(16,185,129,.15);color:var(--green);font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:20px;">Cliente</span>' : ''}
+              ${c.esProveedor ? '<span style="background:rgba(79,110,247,.15);color:var(--accent);font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:3px;">Prov.</span>' : ''}
+            </td>
+            <td><button class="btn btn-danger-soft btn-sm" onclick="deleteClient(${i})">✕</button></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// ─── Update counts ────────────────────────────────────────────────────────────
+function updateCounts() {
+  const n = clients.length;
+  document.getElementById('tab-count').textContent = n;
+  document.getElementById('list-count').textContent = n;
+  document.getElementById('export-count').textContent = n;
+}
+
+// ─── Export XLSX — EXACT Siigo Nube template columns ────────────────────────
+function exportXLSX() {
+  if (!clients.length) { toast('No hay terceros para exportar', 'err'); return; }
+
+  // Exact column headers from the Siigo template
+  const headers = [
+    'Identificación (Obligatorio)',
+    'Tipo identificación (Obligatorio)',
+    'Tipo (Obligatorio)',
+    'Razón social (Obligatorio)',
+    'Nombres del tercero (Obligatorio)',
+    'Apellidos del tercero (Obligatorio)',
+    'Dirección',
+    'Código país',
+    'Código departamento/estado',
+    'Código ciudad',
+    'Indicativo teléfono principal',
+    'Teléfono principal',
+    'Extensión teléfono principal',
+    'Tipo de régimen IVA',
+    'Nombres contacto principal',
+    'Apellidos contacto principal',
+    'Indicativo teléfono contacto principal',
+    'Teléfono contacto principal',
+    'Extensión teléfono contacto principal',
+    'Correo electrónico contacto principal',
+    'Clientes',
+    'Proveedor'
+  ];
+
+  const rows = clients.map(c => [
+    c.cedula,                  // A - Identificación
+    c.tipoId,                  // B - Tipo identificación
+    c.tipo,                    // C - Tipo (1=natural, 2=jurídica)
+    c.razonSocial,             // D - Razón social
+    c.nombres,                 // E - Nombres del tercero
+    c.apellidos,               // F - Apellidos del tercero
+    c.direccion,               // G - Dirección
+    c.codPais,                 // H - Código país
+    c.codDpto,                 // I - Código departamento
+    c.codCiudad,               // J - Código ciudad
+    c.indicativo,              // K - Indicativo teléfono principal
+    c.celular,                 // L - Teléfono principal
+    c.extension,               // M - Extensión
+    c.regimen,                 // N - Tipo régimen IVA
+    c.nombreContacto,          // O - Nombres contacto
+    c.apellidoContacto,        // P - Apellidos contacto
+    c.indicativoContacto,      // Q - Indicativo teléfono contacto
+    c.celularContacto,         // R - Teléfono contacto
+    c.extensionContacto,       // S - Extensión contacto
+    c.correo,                  // T - Correo contacto
+    c.esCliente,               // U - Clientes
+    c.esProveedor              // V - Proveedor
+  ]);
+
+  const wsData = [headers, ...rows];
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+  // Column widths matching approximate Siigo template
+  ws['!cols'] = [
+    {wch:18},{wch:22},{wch:8},{wch:28},{wch:22},{wch:22},
+    {wch:28},{wch:12},{wch:22},{wch:14},{wch:24},{wch:18},
+    {wch:24},{wch:18},{wch:22},{wch:22},{wch:28},{wch:20},
+    {wch:28},{wch:30},{wch:10},{wch:10}
+  ];
+
+  // Bold header row styling
+  const headerStyle = { font: { bold: true } };
+  headers.forEach((_, ci) => {
+    const cellAddr = XLSX.utils.encode_cell({ r: 0, c: ci });
+    if (!ws[cellAddr]) ws[cellAddr] = { t: 's', v: headers[ci] };
+    ws[cellAddr].s = headerStyle;
+  });
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Hoja 1');
+
+  const fecha = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  XLSX.writeFile(wb, `Modelo_importacion_terceros_Siigo_${fecha}.xlsx`);
+  toast(`✅ Archivo descargado (${clients.length} terceros)`, 'ok');
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+function toast(msg, type = 'ok') {
+  const c = document.getElementById('toasts');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// ─── DANE Colombia data (departamento code → cities with DANE codes) ──────────
+// StateCode = 2-digit DANE dept code, CityCode = 5-digit DANE city code
+// Format: { code, name, cities: [{code, name}] }
+const DANE = [
+  { code:'91', name:'Amazonas', cities:[{code:'91001',name:'Leticia'},{code:'91540',name:'Puerto Nariño'}]},
+  { code:'05', name:'Antioquia', cities:[{code:'05001',name:'Medellín'},{code:'05002',name:'Abejorral'},{code:'05004',name:'Abriaquí'},{code:'05021',name:'Alejandría'},{code:'05030',name:'Amagá'},{code:'05031',name:'Amalfi'},{code:'05034',name:'Andes'},{code:'05036',name:'Angelópolis'},{code:'05038',name:'Angostura'},{code:'05040',name:'Anorí'},{code:'05044',name:'Anzá'},{code:'05045',name:'Apartadó'},{code:'05051',name:'Arboletes'},{code:'05055',name:'Argelia'},{code:'05059',name:'Armenia'},{code:'05079',name:'Barbosa'},{code:'05086',name:'Bello'},{code:'05088',name:'Belmira'},{code:'05091',name:'Betania'},{code:'05093',name:'Betulia'},{code:'05101',name:'Briceño'},{code:'05107',name:'Buriticá'},{code:'05113',name:'Cáceres'},{code:'05120',name:'Caicedo'},{code:'05125',name:'Caldas'},{code:'05129',name:'Campamento'},{code:'05134',name:'Cañasgordas'},{code:'05138',name:'Caracolí'},{code:'05142',name:'Caramanta'},{code:'05145',name:'Carepa'},{code:'05150',name:'Carolina del Príncipe'},{code:'05154',name:'Caucasia'},{code:'05172',name:'Chigorodó'},{code:'05190',name:'Cisneros'},{code:'05101',name:'Ciudad Bolívar'},{code:'05197',name:'Cocorná'},{code:'05206',name:'Concepción'},{code:'05209',name:'Concordia'},{code:'05212',name:'Copacabana'},{code:'05234',name:'Dabeiba'},{code:'05237',name:'Donmatías'},{code:'05240',name:'Ebéjico'},{code:'05250',name:'El Bagre'},{code:'05148',name:'El Carmen de Viboral'},{code:'05264',name:'El Peñol'},{code:'05266',name:'El Retiro'},{code:'05282',name:'El Santuario'},{code:'05306',name:'Entrerríos'},{code:'05310',name:'Envigado'},{code:'05313',name:'Fredonia'},{code:'05315',name:'Frontino'},{code:'05318',name:'Giraldo'},{code:'05321',name:'Girardota'},{code:'05347',name:'Gómez Plata'},{code:'05353',name:'Granada'},{code:'05360',name:'Guadalupe'},{code:'05361',name:'Guarne'},{code:'05364',name:'Guatapé'},{code:'05368',name:'Heliconia'},{code:'05376',name:'Hispania'},{code:'05380',name:'Itagüí'},{code:'05390',name:'Ituango'},{code:'05400',name:'Jardín'},{code:'05411',name:'Jericó'},{code:'05425',name:'La Ceja'},{code:'05430',name:'La Estrella'},{code:'05440',name:'La Pintada'},{code:'05467',name:'La Unión'},{code:'05475',name:'Liborina'},{code:'05480',name:'Maceo'},{code:'05483',name:'Marinilla'},{code:'05490',name:'Montebello'},{code:'05495',name:'Murindó'},{code:'05501',name:'Mutatá'},{code:'05504',name:'Nariño'},{code:'05520',name:'Nechí'},{code:'05515',name:'Necoclí'},{code:'05524',name:'Olaya'},{code:'05541',name:'Peque'},{code:'05543',name:'Pueblorrico'},{code:'05551',name:'Puerto Berrío'},{code:'05554',name:'Puerto Nare'},{code:'05560',name:'Puerto Triunfo'},{code:'05576',name:'Remedios'},{code:'05579',name:'Rionegro'},{code:'05585',name:'Sabanalarga'},{code:'05586',name:'Sabaneta'},{code:'05591',name:'Salgar'},{code:'05604',name:'San Andrés de Cuerquia'},{code:'05607',name:'San Carlos'},{code:'05615',name:'San Francisco'},{code:'05628',name:'San Jerónimo'},{code:'05631',name:'San José de la Montaña'},{code:'05642',name:'San Juan de Urabá'},{code:'05647',name:'San Luis'},{code:'05649',name:'San Pedro de Urabá'},{code:'05652',name:'San Pedro de los Milagros'},{code:'05657',name:'San Rafael'},{code:'05659',name:'San Roque'},{code:'05664',name:'San Vicente'},{code:'05667',name:'Santa Bárbara'},{code:'05042',name:'Santa Fe de Antioquia'},{code:'05674',name:'Santa Rosa de Osos'},{code:'05679',name:'Santo Domingo'},{code:'05686',name:'Segovia'},{code:'05690',name:'Sonsón'},{code:'05697',name:'Sopetrán'},{code:'05736',name:'Támesis'},{code:'05737',name:'Tarazá'},{code:'05743',name:'Tarso'},{code:'05756',name:'Titiribí'},{code:'05761',name:'Toledo'},{code:'05789',name:'Turbo'},{code:'05790',name:'Uramita'},{code:'05792',name:'Urrao'},{code:'05809',name:'Valdivia'},{code:'05819',name:'Valparaíso'},{code:'05837',name:'Vegachí'},{code:'05842',name:'Venecia'},{code:'05873',name:'Vigía del Fuerte'},{code:'05885',name:'Yalí'},{code:'05887',name:'Yarumal'},{code:'05890',name:'Yolombó'},{code:'05893',name:'Yondó'},{code:'05895',name:'Zaragoza'}]},
+  { code:'81', name:'Arauca', cities:[{code:'81001',name:'Arauca'},{code:'81065',name:'Arauquita'},{code:'81220',name:'Cravo Norte'},{code:'81300',name:'Fortul'},{code:'81591',name:'Puerto Rondón'},{code:'81736',name:'Saravena'},{code:'81794',name:'Tame'}]},
+  { code:'08', name:'Atlántico', cities:[{code:'08001',name:'Barranquilla'},{code:'08078',name:'Baranoa'},{code:'08137',name:'Campo de la Cruz'},{code:'08141',name:'Candelaria'},{code:'08296',name:'Galapa'},{code:'08372',name:'Juan de Acosta'},{code:'08421',name:'Luruaco'},{code:'08433',name:'Malambo'},{code:'08436',name:'Manatí'},{code:'08520',name:'Palmar de Varela'},{code:'08549',name:'Piojó'},{code:'08558',name:'Polonuevo'},{code:'08560',name:'Ponedera'},{code:'08573',name:'Puerto Colombia'},{code:'08606',name:'Repelón'},{code:'08634',name:'Sabanagrande'},{code:'08638',name:'Sabanalarga'},{code:'08675',name:'Santa Lucía'},{code:'08685',name:'Santo Tomás'},{code:'08758',name:'Soledad'},{code:'08770',name:'Suán'},{code:'08832',name:'Tubará'},{code:'08849',name:'Usiacurí'}]},
+  { code:'11', name:'Bogotá D.C.', cities:[{code:'11001',name:'Bogotá D.C.'}]},
+  { code:'13', name:'Bolívar', cities:[{code:'13001',name:'Cartagena de Indias'},{code:'13006',name:'Achí'},{code:'13030',name:'Altos del Rosario'},{code:'13042',name:'Arenal'},{code:'13052',name:'Arjona'},{code:'13062',name:'Arroyohondo'},{code:'13074',name:'Barranco de Loba'},{code:'13140',name:'Calamar'},{code:'13160',name:'Cantagallo'},{code:'13188',name:'Cicuco'},{code:'13212',name:'Clemencia'},{code:'13222',name:'Córdoba'},{code:'13244',name:'El Carmen de Bolívar'},{code:'13248',name:'El Guamo'},{code:'13268',name:'El Peñón'},{code:'13300',name:'Hatillo de Loba'},{code:'13430',name:'Magangué'},{code:'13433',name:'Mahates'},{code:'13440',name:'Margarita'},{code:'13442',name:'María la Baja'},{code:'13468',name:'Mompós'},{code:'13458',name:'Montecristo'},{code:'13473',name:'Morales'},{code:'13490',name:'Norosí'},{code:'13549',name:'Pinillos'},{code:'13580',name:'Regidor'},{code:'13600',name:'Río Viejo'},{code:'13620',name:'San Cristóbal'},{code:'13647',name:'San Estanislao'},{code:'13650',name:'San Fernando'},{code:'13654',name:'San Jacinto del Cauca'},{code:'13655',name:'San Jacinto'},{code:'13657',name:'San Juan Nepomuceno'},{code:'13667',name:'San Martín de Loba'},{code:'13670',name:'San Pablo'},{code:'13673',name:'Santa Catalina'},{code:'13683',name:'Santa Rosa'},{code:'13688',name:'Santa Rosa del Sur'},{code:'13744',name:'Simití'},{code:'13760',name:'Soplaviento'},{code:'13780',name:'Talaigua Nuevo'},{code:'13810',name:'Tiquisio'},{code:'13836',name:'Turbaco'},{code:'13838',name:'Turbaná'},{code:'13873',name:'Villanueva'},{code:'13894',name:'Zambrano'}]},
+  { code:'15', name:'Boyacá', cities:[{code:'15001',name:'Tunja'},{code:'15022',name:'Almeida'},{code:'15047',name:'Aquitania'},{code:'15051',name:'Arcabuco'},{code:'15087',name:'Belén'},{code:'15090',name:'Berbeo'},{code:'15092',name:'Betéitiva'},{code:'15097',name:'Boavita'},{code:'15104',name:'Boyacá'},{code:'15106',name:'Briceño'},{code:'15109',name:'Buenavista'},{code:'15114',name:'Busbanzá'},{code:'15131',name:'Caldas'},{code:'15135',name:'Campohermoso'},{code:'15162',name:'Cerinza'},{code:'15172',name:'Chinavita'},{code:'15176',name:'Chiquinquirá'},{code:'15232',name:'Chivor'},{code:'15180',name:'Chíquiza'},{code:'15183',name:'Chiscas'},{code:'15185',name:'Chita'},{code:'15187',name:'Chitaraque'},{code:'15189',name:'Chivatá'},{code:'15204',name:'Ciénega'},{code:'15212',name:'Cómbita'},{code:'15215',name:'Coper'},{code:'15218',name:'Corrales'},{code:'15223',name:'Covarachía'},{code:'15224',name:'Cubará'},{code:'15226',name:'Cucaita'},{code:'15228',name:'Cuítiva'},{code:'15238',name:'Duitama'},{code:'15244',name:'El Cocuy'},{code:'15248',name:'El Espino'},{code:'15272',name:'Firavitoba'},{code:'15276',name:'Floresta'},{code:'15293',name:'Gachantivá'},{code:'15296',name:'Gámeza'},{code:'15299',name:'Garagoa'},{code:'15317',name:'Guacamayas'},{code:'15322',name:'Guateque'},{code:'15325',name:'Guayatá'},{code:'15332',name:'Güicán'},{code:'15362',name:'Iza'},{code:'15367',name:'Jenesano'},{code:'15368',name:'Jericó'},{code:'15380',name:'La Capilla'},{code:'15401',name:'La Uvita'},{code:'15403',name:'La Victoria'},{code:'15407',name:'Labranzagrande'},{code:'15425',name:'Macanal'},{code:'15442',name:'Maripí'},{code:'15455',name:'Miraflores'},{code:'15464',name:'Mongua'},{code:'15466',name:'Monguí'},{code:'15469',name:'Moniquirá'},{code:'15476',name:'Motavita'},{code:'15480',name:'Muzo'},{code:'15491',name:'Nobsa'},{code:'15494',name:'Nuevo Colón'},{code:'15500',name:'Oicatá'},{code:'15507',name:'Otanche'},{code:'15511',name:'Pachavita'},{code:'15514',name:'Páez'},{code:'15516',name:'Paipa'},{code:'15518',name:'Pajarito'},{code:'15522',name:'Panqueba'},{code:'15531',name:'Pauna'},{code:'15533',name:'Paya'},{code:'15537',name:'Paz del Río'},{code:'15542',name:'Pesca'},{code:'15550',name:'Pisba'},{code:'15572',name:'Puerto Boyacá'},{code:'15580',name:'Quípama'},{code:'15599',name:'Ramiriquí'},{code:'15600',name:'Ráquira'},{code:'15621',name:'Rondón'},{code:'15632',name:'Saboyá'},{code:'15638',name:'Sáchica'},{code:'15646',name:'Samacá'},{code:'15660',name:'San Eduardo'},{code:'15664',name:'San José de Pare'},{code:'15667',name:'San Luis de Gaceno'},{code:'15673',name:'San Mateo'},{code:'15676',name:'San Miguel de Sema'},{code:'15681',name:'San Pablo de Borbur'},{code:'15690',name:'Santa María'},{code:'15693',name:'Santa Rosa de Viterbo'},{code:'15696',name:'Santa Sofía'},{code:'15686',name:'Santana'},{code:'15700',name:'Sativanorte'},{code:'15703',name:'Sativasur'},{code:'15720',name:'Siachoque'},{code:'15723',name:'Soatá'},{code:'15740',name:'Socha'},{code:'15753',name:'Socotá'},{code:'15757',name:'Sogamoso'},{code:'15759',name:'Somondoco'},{code:'15761',name:'Sora'},{code:'15762',name:'Soracá'},{code:'15763',name:'Sotaquirá'},{code:'15774',name:'Susacón'},{code:'15776',name:'Sutamarchán'},{code:'15778',name:'Sutatenza'},{code:'15790',name:'Tasco'},{code:'15798',name:'Tenza'},{code:'15804',name:'Tibaná'},{code:'15806',name:'Tibasosa'},{code:'15808',name:'Tinjacá'},{code:'15810',name:'Tipacoque'},{code:'15814',name:'Toca'},{code:'15816',name:'Togüí'},{code:'15820',name:'Tópaga'},{code:'15822',name:'Tota'},{code:'15835',name:'Tununguá'},{code:'15837',name:'Turmequé'},{code:'15839',name:'Tuta'},{code:'15842',name:'Tutazá'},{code:'15861',name:'Úmbita'},{code:'15879',name:'Ventaquemada'},{code:'15897',name:'Villa de Leyva'},{code:'15900',name:'Viracachá'},{code:'15902',name:'Zetaquira'}]},
+  { code:'17', name:'Caldas', cities:[{code:'17001',name:'Manizales'},{code:'17013',name:'Aguadas'},{code:'17042',name:'Anserma'},{code:'17050',name:'Aranzazu'},{code:'17088',name:'Belalcázar'},{code:'17174',name:'Chinchiná'},{code:'17272',name:'Filadelfia'},{code:'17380',name:'La Dorada'},{code:'17388',name:'La Merced'},{code:'17433',name:'Manzanares'},{code:'17442',name:'Marmato'},{code:'17444',name:'Marquetalia'},{code:'17446',name:'Marulanda'},{code:'17486',name:'Neira'},{code:'17495',name:'Norcasia'},{code:'17524',name:'Pácora'},{code:'17541',name:'Palestina'},{code:'17543',name:'Pensilvania'},{code:'17614',name:'Riosucio'},{code:'17616',name:'Risaralda'},{code:'17653',name:'Salamina'},{code:'17662',name:'Samaná'},{code:'17665',name:'San José'},{code:'17777',name:'Supía'},{code:'17867',name:'Victoria'},{code:'17873',name:'Villamaría'},{code:'17877',name:'Viterbo'}]},
+  { code:'18', name:'Caquetá', cities:[{code:'18001',name:'Florencia'},{code:'18029',name:'Albania'},{code:'18094',name:'Belén de los Andaquíes'},{code:'18150',name:'Cartagena del Chairá'},{code:'18205',name:'Curillo'},{code:'18247',name:'El Doncello'},{code:'18256',name:'El Paujil'},{code:'18410',name:'La Montañita'},{code:'18460',name:'Milán'},{code:'18479',name:'Morelia'},{code:'18592',name:'Puerto Rico'},{code:'18610',name:'San José del Fragua'},{code:'18753',name:'San Vicente del Caguán'},{code:'18756',name:'Solano'},{code:'18785',name:'Solita'},{code:'18860',name:'Valparaíso'}]},
+  { code:'85', name:'Casanare', cities:[{code:'85001',name:'Yopal'},{code:'85010',name:'Aguazul'},{code:'85015',name:'Chámeza'},{code:'85125',name:'Hato Corozal'},{code:'85136',name:'La Salina'},{code:'85139',name:'Maní'},{code:'85162',name:'Monterrey'},{code:'85225',name:'Nunchía'},{code:'85230',name:'Orocué'},{code:'85250',name:'Paz de Ariporo'},{code:'85263',name:'Pore'},{code:'85279',name:'Recetor'},{code:'85300',name:'Sabanalarga'},{code:'85315',name:'Sácama'},{code:'85325',name:'San Luis de Palenque'},{code:'85400',name:'Támara'},{code:'85410',name:'Tauramena'},{code:'85430',name:'Trinidad'},{code:'85440',name:'Villanueva'}]},
+  { code:'19', name:'Cauca', cities:[{code:'19001',name:'Popayán'},{code:'19022',name:'Almaguer'},{code:'19050',name:'Argelia'},{code:'19075',name:'Balboa'},{code:'19100',name:'Bolívar'},{code:'19110',name:'Buenos Aires'},{code:'19130',name:'Cajibío'},{code:'19137',name:'Caldono'},{code:'19142',name:'Caloto'},{code:'19212',name:'Corinto'},{code:'19256',name:'El Tambo'},{code:'19290',name:'Florencia'},{code:'19300',name:'Guachené'},{code:'19318',name:'Guapí'},{code:'19355',name:'Inzá'},{code:'19364',name:'Jambaló'},{code:'19392',name:'La Sierra'},{code:'19397',name:'La Vega'},{code:'19418',name:'López de Micay'},{code:'19450',name:'Mercaderes'},{code:'19455',name:'Miranda'},{code:'19473',name:'Morales'},{code:'19513',name:'Padilla'},{code:'19532',name:'Páez'},{code:'19533',name:'Patía'},{code:'19548',name:'Piamonte'},{code:'19551',name:'Piendamó'},{code:'19573',name:'Puerto Tejada'},{code:'19585',name:'Puracé'},{code:'19622',name:'Rosas'},{code:'19693',name:'San Sebastián'},{code:'19698',name:'Santa Rosa'},{code:'19701',name:'Santander de Quilichao'},{code:'19743',name:'Silvia'},{code:'19760',name:'Sotará'},{code:'19780',name:'Suárez'},{code:'19785',name:'Sucre'},{code:'19807',name:'Timbío'},{code:'19809',name:'Timbiquí'},{code:'19821',name:'Toribío'},{code:'19824',name:'Totoró'},{code:'19845',name:'Villa Rica'}]},
+  { code:'20', name:'Cesar', cities:[{code:'20001',name:'Valledupar'},{code:'20011',name:'Aguachica'},{code:'20013',name:'Agustín Codazzi'},{code:'20032',name:'Astrea'},{code:'20045',name:'Becerril'},{code:'20060',name:'Bosconia'},{code:'20175',name:'Chimichagua'},{code:'20178',name:'Chiriguaná'},{code:'20228',name:'Curumaní'},{code:'20238',name:'El Copey'},{code:'20250',name:'El Paso'},{code:'20295',name:'Gamarra'},{code:'20310',name:'González'},{code:'20383',name:'La Gloria'},{code:'20400',name:'La Jagua de Ibirico'},{code:'20621',name:'La Paz'},{code:'20443',name:'Manaure Balcón del Cesar'},{code:'20517',name:'Pailitas'},{code:'20550',name:'Pelaya'},{code:'20570',name:'Pueblo Bello'},{code:'20614',name:'Río de Oro'},{code:'20710',name:'San Alberto'},{code:'20750',name:'San Diego'},{code:'20770',name:'San Martín'},{code:'20787',name:'Tamalameque'}]},
+  { code:'27', name:'Chocó', cities:[{code:'27001',name:'Quibdó'},{code:'27006',name:'Acandí'},{code:'27025',name:'Alto Baudó'},{code:'27050',name:'Bagadó'},{code:'27073',name:'Bahía Solano'},{code:'27075',name:'Bajo Baudó'},{code:'27099',name:'Bojayá'},{code:'27135',name:'Cantón de San Pablo'},{code:'27150',name:'Cértegui'},{code:'27160',name:'Condoto'},{code:'27205',name:'El Atrato'},{code:'27245',name:'El Carmen de Atrato'},{code:'27250',name:'El Carmen del Darién'},{code:'27361',name:'Istmina'},{code:'27372',name:'Juradó'},{code:'27413',name:'Litoral de San Juan'},{code:'27425',name:'Lloró'},{code:'27430',name:'Medio Atrato'},{code:'27450',name:'Medio Baudó'},{code:'27491',name:'Medio San Juan'},{code:'27495',name:'Nóvita'},{code:'27500',name:'Nuquí'},{code:'27580',name:'Río Iró'},{code:'27600',name:'Río Quito'},{code:'27615',name:'Riosucio'},{code:'27660',name:'San José del Palmar'},{code:'27745',name:'Sipí'},{code:'27787',name:'Tadó'},{code:'27800',name:'Unión Panamericana'},{code:'27810',name:'Unguía'}]},
+  { code:'25', name:'Cundinamarca', cities:[{code:'25019',name:'Agua de Dios'},{code:'25035',name:'Albán'},{code:'25040',name:'Anapoima'},{code:'25053',name:'Anolaima'},{code:'25086',name:'Apulo'},{code:'25095',name:'Arbeláez'},{code:'25120',name:'Beltrán'},{code:'25123',name:'Bituima'},{code:'25175',name:'Bojacá'},{code:'25178',name:'Cabrera'},{code:'25181',name:'Cachipay'},{code:'25183',name:'Cajicá'},{code:'25200',name:'Caparrapí'},{code:'25214',name:'Cáqueza'},{code:'25224',name:'Carmen de Carupa'},{code:'25245',name:'Chaguaní'},{code:'25258',name:'Chía'},{code:'25260',name:'Chipaque'},{code:'25269',name:'Choachí'},{code:'25288',name:'Chocontá'},{code:'25295',name:'Cogua'},{code:'25307',name:'Cota'},{code:'25312',name:'Cucunubá'},{code:'25320',name:'El Colegio'},{code:'25322',name:'El Peñón'},{code:'25328',name:'El Rosal'},{code:'25335',name:'Facatativá'},{code:'25386',name:'Fómeque'},{code:'25394',name:'Fosca'},{code:'25430',name:'Funza'},{code:'25438',name:'Fúquene'},{code:'25473',name:'Fusagasugá'},{code:'25483',name:'Gachalá'},{code:'25486',name:'Gachancipá'},{code:'25488',name:'Gachetá'},{code:'25491',name:'Gama'},{code:'25513',name:'Girardot'},{code:'25518',name:'Granada'},{code:'25524',name:'Guachetá'},{code:'25530',name:'Guaduas'},{code:'25535',name:'Guasca'},{code:'25537',name:'Guataquí'},{code:'25539',name:'Guatavita'},{code:'25541',name:'Guayabal de Síquima'},{code:'25543',name:'Guayabetal'},{code:'25549',name:'Gutiérrez'},{code:'25572',name:'Jerusalén'},{code:'25580',name:'Junín'},{code:'25592',name:'La Calera'},{code:'25612',name:'La Mesa'},{code:'25645',name:'La Palma'},{code:'25649',name:'La Peña'},{code:'25653',name:'La Vega'},{code:'25658',name:'Lenguazaque'},{code:'25662',name:'Machetá'},{code:'25718',name:'Madrid'},{code:'25736',name:'Manta'},{code:'25743',name:'Medina'},{code:'25754',name:'Mosquera'},{code:'25772',name:'Nariño'},{code:'25777',name:'Nemocón'},{code:'25779',name:'Nilo'},{code:'25781',name:'Nimaima'},{code:'25785',name:'Nocaima'},{code:'25843',name:'Pacho'},{code:'25845',name:'Paime'},{code:'25851',name:'Pandi'},{code:'25862',name:'Paratebueno'},{code:'25867',name:'Pasca'},{code:'25873',name:'Puerto Salgar'},{code:'25878',name:'Pulí'},{code:'25898',name:'Quebradanegra'},{code:'25899',name:'Quetame'},{code:'25900',name:'Quipile'},{code:'25915',name:'Ricaurte'},{code:'25649',name:'San Antonio del Tequendama'},{code:'25653',name:'San Bernardo'},{code:'25658',name:'San Cayetano'},{code:'25662',name:'San Francisco'},{code:'25718',name:'San Juan de Rioseco'},{code:'25736',name:'Sasaima'},{code:'25740',name:'Sesquilé'},{code:'25743',name:'Sibaté'},{code:'25745',name:'Silvania'},{code:'25754',name:'Simijaca'},{code:'25758',name:'Soacha'},{code:'25769',name:'Sopó'},{code:'25772',name:'Subachoque'},{code:'25777',name:'Suesca'},{code:'25779',name:'Supátá'},{code:'25781',name:'Susa'},{code:'25785',name:'Sutatausa'},{code:'25799',name:'Tabio'},{code:'25805',name:'Tausa'},{code:'25815',name:'Tena'},{code:'25817',name:'Tenjo'},{code:'25823',name:'Tibacuy'},{code:'25839',name:'Tibirita'},{code:'25841',name:'Tocaima'},{code:'25843',name:'Tocancipá'},{code:'25845',name:'Topaipí'},{code:'25867',name:'Ubalá'},{code:'25871',name:'Ubaque'},{code:'25875',name:'Ubaté'},{code:'25878',name:'Une'},{code:'25885',name:'Útica'},{code:'25898',name:'Venecia'},{code:'25899',name:'Vergara'},{code:'25900',name:'Vianí'},{code:'25915',name:'Villagómez'},{code:'25938',name:'Villapinzón'},{code:'25966',name:'Villeta'},{code:'25973',name:'Viotá'},{code:'25975',name:'Yacopí'},{code:'25989',name:'Zipacón'},{code:'25899',name:'Zipaquirá'}]},
+  { code:'23', name:'Córdoba', cities:[{code:'23001',name:'Montería'},{code:'23068',name:'Ayapel'},{code:'23079',name:'Buenavista'},{code:'23090',name:'Canalete'},{code:'23162',name:'Cereté'},{code:'23168',name:'Chimá'},{code:'23182',name:'Chinú'},{code:'23189',name:'Ciénaga de Oro'},{code:'23300',name:'Cotorra'},{code:'23350',name:'La Apartada'},{code:'23417',name:'Lorica'},{code:'23419',name:'Los Córdobas'},{code:'23464',name:'Momil'},{code:'23466',name:'Montelíbano'},{code:'23500',name:'Moñitos'},{code:'23555',name:'Planeta Rica'},{code:'23570',name:'Pueblo Nuevo'},{code:'23574',name:'Puerto Escondido'},{code:'23580',name:'Puerto Libertador'},{code:'23586',name:'Purísima'},{code:'23660',name:'Sahagún'},{code:'23670',name:'San Andrés de Sotavento'},{code:'23672',name:'San Antero'},{code:'23675',name:'San Bernardo del Viento'},{code:'23678',name:'San Carlos'},{code:'23682',name:'San José de Uré'},{code:'23686',name:'San Pelayo'},{code:'23807',name:'Tierralta'},{code:'23815',name:'Tuchín'},{code:'23855',name:'Valencia'}]},
+  { code:'94', name:'Guainía', cities:[{code:'94001',name:'Inírida'},{code:'94343',name:'Barrancominas'},{code:'94884',name:'Cacahual'},{code:'94885',name:'La Guadalupe'},{code:'94886',name:'Mapiripana'},{code:'94887',name:'Morichal Nuevo'},{code:'94888',name:'Pana Pana'},{code:'94889',name:'Puerto Colombia'},{code:'94890',name:'San Felipe'}]},
+  { code:'95', name:'Guaviare', cities:[{code:'95001',name:'San José del Guaviare'},{code:'95015',name:'Calamar'},{code:'95025',name:'El Retorno'},{code:'95200',name:'Miraflores'}]},
+  { code:'41', name:'Huila', cities:[{code:'41001',name:'Neiva'},{code:'41006',name:'Acevedo'},{code:'41013',name:'Agrado'},{code:'41016',name:'Aipe'},{code:'41020',name:'Algeciras'},{code:'41026',name:'Altamira'},{code:'41078',name:'Baraya'},{code:'41132',name:'Campoalegre'},{code:'41206',name:'Colombia'},{code:'41244',name:'El Pital'},{code:'41268',name:'Elías'},{code:'41298',name:'Garzón'},{code:'41306',name:'Gigante'},{code:'41319',name:'Guadalupe'},{code:'41349',name:'Hobo'},{code:'41357',name:'Íquira'},{code:'41359',name:'Isnos'},{code:'41378',name:'La Argentina'},{code:'41396',name:'La Plata'},{code:'41483',name:'Nátaga'},{code:'41503',name:'Oporapa'},{code:'41518',name:'Paicol'},{code:'41524',name:'Palermo'},{code:'41530',name:'Palestina'},{code:'41548',name:'Pitalito'},{code:'41615',name:'Rivera'},{code:'41660',name:'Saladoblanco'},{code:'41668',name:'San Agustín'},{code:'41676',name:'Santa María'},{code:'41770',name:'Suaza'},{code:'41791',name:'Tarqui'},{code:'41797',name:'Tello'},{code:'41799',name:'Teruel'},{code:'41801',name:'Tesalia'},{code:'41807',name:'Timaná'},{code:'41872',name:'Villavieja'},{code:'41885',name:'Yaguará'}]},
+  { code:'44', name:'La Guajira', cities:[{code:'44001',name:'Riohacha'},{code:'44035',name:'Albania'},{code:'44078',name:'Barrancas'},{code:'44090',name:'Dibulla'},{code:'44098',name:'Distracción'},{code:'44110',name:'El Molino'},{code:'44279',name:'Fonseca'},{code:'44378',name:'Hatonuevo'},{code:'44420',name:'La Jagua del Pilar'},{code:'44430',name:'Maicao'},{code:'44560',name:'Manaure'},{code:'44650',name:'San Juan del Cesar'},{code:'44847',name:'Uribia'},{code:'44855',name:'Urumita'},{code:'44874',name:'Villanueva'}]},
+  { code:'47', name:'Magdalena', cities:[{code:'47001',name:'Santa Marta'},{code:'47030',name:'Algarrobo'},{code:'47053',name:'Aracataca'},{code:'47058',name:'Ariguaní'},{code:'47161',name:'Cerro de San Antonio'},{code:'47170',name:'Chibolo'},{code:'47189',name:'Ciénaga'},{code:'47205',name:'Concordia'},{code:'47245',name:'El Banco'},{code:'47258',name:'El Piñón'},{code:'47268',name:'El Retén'},{code:'47288',name:'Fundación'},{code:'47318',name:'Guamal'},{code:'47460',name:'Nueva Granada'},{code:'47541',name:'Pedraza'},{code:'47545',name:'Pijiño del Carmen'},{code:'47551',name:'Pivijay'},{code:'47555',name:'Plato'},{code:'47570',name:'Pueblo Viejo'},{code:'47605',name:'Remolino'},{code:'47660',name:'Sabanas de San Ángel'},{code:'47675',name:'Salamina'},{code:'47692',name:'San Sebastián de Buenavista'},{code:'47703',name:'San Zenón'},{code:'47707',name:'Santa Ana'},{code:'47720',name:'Santa Bárbara de Pinto'},{code:'47745',name:'Sitionuevo'},{code:'47798',name:'Tenerife'},{code:'47960',name:'Zapayán'},{code:'47980',name:'Zona Bananera'}]},
+  { code:'50', name:'Meta', cities:[{code:'50001',name:'Villavicencio'},{code:'50006',name:'Acacías'},{code:'50110',name:'Barranca de Upía'},{code:'50124',name:'Cabuyaro'},{code:'50150',name:'Castilla la Nueva'},{code:'50223',name:'Cubarral'},{code:'50226',name:'Cumaral'},{code:'50245',name:'El Calvario'},{code:'50251',name:'El Castillo'},{code:'50270',name:'El Dorado'},{code:'50287',name:'Fuente de Oro'},{code:'50313',name:'Granada'},{code:'50318',name:'Guamal'},{code:'50370',name:'La Macarena'},{code:'50350',name:'La Uribe'},{code:'50400',name:'Lejanías'},{code:'50325',name:'Mapiripán'},{code:'50330',name:'Mesetas'},{code:'50568',name:'Puerto Concordia'},{code:'50573',name:'Puerto Gaitán'},{code:'50577',name:'Puerto Lleras'},{code:'50590',name:'Puerto López'},{code:'50606',name:'Puerto Rico'},{code:'50686',name:'Restrepo'},{code:'50689',name:'San Carlos de Guaroa'},{code:'50711',name:'San Juan de Arama'},{code:'50716',name:'San Juanito'},{code:'50223',name:'San Martín'},{code:'50370',name:'Vista Hermosa'}]},
+  { code:'52', name:'Nariño', cities:[{code:'52001',name:'Pasto'},{code:'52019',name:'Aldana'},{code:'52022',name:'Ancuyá'},{code:'52036',name:'Arboleda'},{code:'52051',name:'Barbacoas'},{code:'52079',name:'Belén'},{code:'52083',name:'Buesaco'},{code:'52110',name:'Chachagüí'},{code:'52203',name:'Colón'},{code:'52207',name:'Consacá'},{code:'52210',name:'Contadero'},{code:'52215',name:'Córdoba'},{code:'52224',name:'Cuaspud'},{code:'52227',name:'Cumbal'},{code:'52233',name:'Cumbitara'},{code:'52240',name:'El Charco'},{code:'52250',name:'El Peñol'},{code:'52254',name:'El Rosario'},{code:'52256',name:'El Tablón'},{code:'52258',name:'El Tambo'},{code:'52286',name:'Francisco Pizarro'},{code:'52287',name:'Funes'},{code:'52317',name:'Guachucal'},{code:'52320',name:'Guaitarilla'},{code:'52323',name:'Gualmatán'},{code:'52352',name:'Iles'},{code:'52354',name:'Imués'},{code:'52356',name:'Ipiales'},{code:'52378',name:'La Cruz'},{code:'52381',name:'La Florida'},{code:'52385',name:'La Llanada'},{code:'52390',name:'La Tola'},{code:'52399',name:'La Unión'},{code:'52405',name:'Leiva'},{code:'52411',name:'Linares'},{code:'52418',name:'Los Andes'},{code:'52427',name:'Magüí Payán'},{code:'52435',name:'Mallama'},{code:'52473',name:'Mosquera'},{code:'52480',name:'Nariño'},{code:'52490',name:'Olaya Herrera'},{code:'52506',name:'Ospina'},{code:'52520',name:'Policarpa'},{code:'52540',name:'Potosí'},{code:'52560',name:'Providencia'},{code:'52565',name:'Puerres'},{code:'52573',name:'Pupiales'},{code:'52585',name:'Ricaurte'},{code:'52612',name:'Roberto Payán'},{code:'52621',name:'Samaniego'},{code:'52678',name:'San Bernardo'},{code:'52683',name:'San José de Albán'},{code:'52685',name:'San Lorenzo'},{code:'52687',name:'San Pablo'},{code:'52693',name:'San Pedro de Cartago'},{code:'52694',name:'Sandoná'},{code:'52696',name:'Santa Bárbara'},{code:'52699',name:'Santacruz'},{code:'52720',name:'Sapuyes'},{code:'52786',name:'Taminango'},{code:'52788',name:'Tangua'},{code:'52835',name:'Tumaco'},{code:'52838',name:'Túquerres'},{code:'52885',name:'Yacuanquer'}]},
+  { code:'54', name:'Norte de Santander', cities:[{code:'54001',name:'Cúcuta'},{code:'54003',name:'Ábrego'},{code:'54051',name:'Arboledas'},{code:'54099',name:'Bochalema'},{code:'54109',name:'Bucarasica'},{code:'54128',name:'Cáchira'},{code:'54125',name:'Cácota'},{code:'54172',name:'Chinácota'},{code:'54174',name:'Chitagá'},{code:'54206',name:'Convención'},{code:'54245',name:'Cucutilla'},{code:'54250',name:'Durania'},{code:'54261',name:'El Carmen'},{code:'54313',name:'El Tarra'},{code:'54344',name:'El Zulia'},{code:'54385',name:'Gramalote'},{code:'54398',name:'Hacarí'},{code:'54405',name:'Herrán'},{code:'54418',name:'La Esperanza'},{code:'54418',name:'La Playa de Belén'},{code:'54480',name:'Labateca'},{code:'54498',name:'Los Patios'},{code:'54518',name:'Lourdes'},{code:'54553',name:'Mutiscua'},{code:'54599',name:'Ocaña'},{code:'54660',name:'Pamplona'},{code:'54673',name:'Pamplonita'},{code:'54680',name:'Puerto Santander'},{code:'54720',name:'Ragonvalia'},{code:'54743',name:'Salazar de Las Palmas'},{code:'54800',name:'San Calixto'},{code:'54810',name:'San Cayetano'},{code:'54820',name:'Santiago'},{code:'54874',name:'Santo Domingo de Silos'},{code:'54880',name:'Sardinata'},{code:'54884',name:'Teorama'},{code:'54800',name:'Tibú'},{code:'54810',name:'Toledo'},{code:'54820',name:'Villa Caro'},{code:'54874',name:'Villa del Rosario'}]},
+  { code:'86', name:'Putumayo', cities:[{code:'86001',name:'Mocoa'},{code:'86219',name:'Colón'},{code:'86320',name:'Orito'},{code:'86568',name:'Puerto Asís'},{code:'86569',name:'Puerto Caicedo'},{code:'86571',name:'Puerto Guzmán'},{code:'86573',name:'Puerto Leguízamo'},{code:'86749',name:'San Francisco'},{code:'86755',name:'San Miguel'},{code:'86760',name:'Santiago'},{code:'86865',name:'Sibundoy'},{code:'86885',name:'Valle del Guamuez'},{code:'86895',name:'Villagarzón'}]},
+  { code:'63', name:'Quindío', cities:[{code:'63001',name:'Armenia'},{code:'63111',name:'Buenavista'},{code:'63130',name:'Calarcá'},{code:'63190',name:'Circasia'},{code:'63212',name:'Córdoba'},{code:'63272',name:'Filandia'},{code:'63302',name:'Génova'},{code:'63401',name:'La Tebaida'},{code:'63470',name:'Montenegro'},{code:'63548',name:'Pijao'},{code:'63594',name:'Quimbaya'},{code:'63690',name:'Salento'}]},
+  { code:'66', name:'Risaralda', cities:[{code:'66001',name:'Pereira'},{code:'66045',name:'Apía'},{code:'66075',name:'Balboa'},{code:'66088',name:'Belén de Umbría'},{code:'66170',name:'Dosquebradas'},{code:'66318',name:'Guática'},{code:'66383',name:'La Celia'},{code:'66400',name:'La Virginia'},{code:'66440',name:'Marsella'},{code:'66456',name:'Mistrató'},{code:'66572',name:'Pueblo Rico'},{code:'66594',name:'Quinchía'},{code:'66682',name:'Santa Rosa de Cabal'},{code:'66687',name:'Santuario'}]},
+  { code:'88', name:'San Andrés y Providencia', cities:[{code:'88001',name:'San Andrés'},{code:'88564',name:'Providencia y Santa Catalina Islas'}]},
+  { code:'68', name:'Santander', cities:[{code:'68001',name:'Bucaramanga'},{code:'68013',name:'Aguada'},{code:'68020',name:'Albania'},{code:'68051',name:'Aratoca'},{code:'68077',name:'Barbosa'},{code:'68079',name:'Barichara'},{code:'68081',name:'Barrancabermeja'},{code:'68092',name:'Betulia'},{code:'68101',name:'Bolívar'},{code:'68121',name:'Cabrera'},{code:'68132',name:'California'},{code:'68147',name:'Capitanejo'},{code:'68152',name:'Carcasí'},{code:'68160',name:'Cepitá'},{code:'68162',name:'Cerrito'},{code:'68167',name:'Charalá'},{code:'68169',name:'Charta'},{code:'68176',name:'Chima'},{code:'68179',name:'Chipatá'},{code:'68190',name:'Cimitarra'},{code:'68207',name:'Concepción'},{code:'68209',name:'Confines'},{code:'68211',name:'Contratación'},{code:'68217',name:'Coromoro'},{code:'68229',name:'Curitî'},{code:'68235',name:'El Carmen de Chucurí'},{code:'68245',name:'El Guacamayo'},{code:'68250',name:'El Peñón'},{code:'68255',name:'El Playón'},{code:'68264',name:'El Socorro'},{code:'68266',name:'Encino'},{code:'68271',name:'Enciso'},{code:'68276',name:'Florián'},{code:'68296',name:'Floridablanca'},{code:'68298',name:'Galán'},{code:'68307',name:'Gámbita'},{code:'68318',name:'Girón'},{code:'68320',name:'Guaca'},{code:'68322',name:'Guadalupe'},{code:'68324',name:'Guapotá'},{code:'68327',name:'Guavatá'},{code:'68344',name:'Güepsa'},{code:'68368',name:'Hato'},{code:'68370',name:'Jesús María'},{code:'68377',name:'Jordán'},{code:'68385',name:'La Belleza'},{code:'68397',name:'La Paz'},{code:'68406',name:'Landázuri'},{code:'68418',name:'Lebrija'},{code:'68425',name:'Los Santos'},{code:'68432',name:'Macaravita'},{code:'68444',name:'Málaga'},{code:'68464',name:'Matanza'},{code:'68468',name:'Mogotes'},{code:'68469',name:'Molagavita'},{code:'68498',name:'Ocamonte'},{code:'68500',name:'Oiba'},{code:'68502',name:'Onzaga'},{code:'68522',name:'Palmar'},{code:'68524',name:'Palmas del Socorro'},{code:'68533',name:'Páramo'},{code:'68547',name:'Piedecuesta'},{code:'68549',name:'Pinchote'},{code:'68572',name:'Puente Nacional'},{code:'68573',name:'Puerto Parra'},{code:'68575',name:'Puerto Wilches'},{code:'68615',name:'Rionegro'},{code:'68655',name:'Sabana de Torres'},{code:'68669',name:'San Andrés'},{code:'68673',name:'San Benito'},{code:'68679',name:'San Gil'},{code:'68682',name:'San Joaquín'},{code:'68684',name:'San José de Miranda'},{code:'68686',name:'San Miguel'},{code:'68689',name:'San Vicente de Chucurí'},{code:'68705',name:'Santa Bárbara'},{code:'68720',name:'Santa Helena del Opón'},{code:'68745',name:'Simacota'},{code:'68770',name:'Suaita'},{code:'68773',name:'Sucre'},{code:'68780',name:'Suratá'},{code:'68820',name:'Tona'},{code:'68855',name:'Valle de San José'},{code:'68861',name:'Vélez'},{code:'68867',name:'Vetas'},{code:'68872',name:'Villanueva'},{code:'68895',name:'Zapatoca'}]},
+  { code:'70', name:'Sucre', cities:[{code:'70001',name:'Sincelejo'},{code:'70110',name:'Buenavista'},{code:'70124',name:'Caimito'},{code:'70204',name:'Chalán'},{code:'70215',name:'Colosó'},{code:'70221',name:'Corozal'},{code:'70233',name:'Coveñas'},{code:'70235',name:'El Roble'},{code:'70265',name:'Galeras'},{code:'70400',name:'Guaranda'},{code:'70418',name:'La Unión'},{code:'70429',name:'Los Palmitos'},{code:'70473',name:'Majagual'},{code:'70508',name:'Morroa'},{code:'70523',name:'Ovejas'},{code:'70670',name:'Sampués'},{code:'70678',name:'San Antonio de Palmito'},{code:'70702',name:'San Benito Abad'},{code:'70708',name:'San Juan de Betulia'},{code:'70713',name:'San Marcos'},{code:'70717',name:'San Onofre'},{code:'70820',name:'San Pedro'},{code:'70771',name:'Sincé'},{code:'70820',name:'Sucre'},{code:'70823',name:'Tolú'},{code:'70828',name:'Tolú Viejo'}]},
+  { code:'73', name:'Tolima', cities:[{code:'73001',name:'Ibagué'},{code:'73024',name:'Alpujarra'},{code:'73026',name:'Alvarado'},{code:'73030',name:'Ambalema'},{code:'73043',name:'Anzuátegui'},{code:'73055',name:'Armero'},{code:'73067',name:'Ataco'},{code:'73124',name:'Cajamarca'},{code:'73148',name:'Carmen de Apicalá'},{code:'73152',name:'Casabianca'},{code:'73168',name:'Chaparral'},{code:'73200',name:'Coello'},{code:'73217',name:'Coyaima'},{code:'73226',name:'Cunday'},{code:'73236',name:'Dolores'},{code:'73268',name:'El Espinal'},{code:'73270',name:'Falán'},{code:'73275',name:'Flandes'},{code:'73283',name:'Fresno'},{code:'73319',name:'Guamo'},{code:'73347',name:'Herveo'},{code:'73349',name:'Honda'},{code:'73408',name:'Icononzo'},{code:'73443',name:'Lérida'},{code:'73449',name:'Líbano'},{code:'73461',name:'Mariquita'},{code:'73483',name:'Melgar'},{code:'73504',name:'Murillo'},{code:'73520',name:'Natagaima'},{code:'73555',name:'Ortega'},{code:'73563',name:'Palocabildo'},{code:'73585',name:'Piedras'},{code:'73616',name:'Planadas'},{code:'73622',name:'Prado'},{code:'73624',name:'Purificación'},{code:'73671',name:'Rioblanco'},{code:'73675',name:'Roncesvalles'},{code:'73678',name:'Rovira'},{code:'73686',name:'Saldaña'},{code:'73770',name:'San Antonio'},{code:'73775',name:'San Luis'},{code:'73854',name:'Santa Isabel'},{code:'73861',name:'Suárez'},{code:'73873',name:'Valle de San Juan'},{code:'73882',name:'Venadillo'},{code:'73895',name:'Villahermosa'},{code:'73897',name:'Villarrica'}]},
+  { code:'76', name:'Valle del Cauca', cities:[{code:'76001',name:'Cali'},{code:'76020',name:'Alcalá'},{code:'76036',name:'Andalucía'},{code:'76041',name:'Ansermanuevo'},{code:'76054',name:'Argelia'},{code:'76100',name:'Bolívar'},{code:'76109',name:'Buenaventura'},{code:'76111',name:'Buga'},{code:'76113',name:'Bugalagrande'},{code:'76122',name:'Caicedonia'},{code:'76126',name:'Calima'},{code:'76130',name:'Candelaria'},{code:'76147',name:'Cartago'},{code:'76233',name:'Dagua'},{code:'76243',name:'El Águila'},{code:'76246',name:'El Cairo'},{code:'76248',name:'El Cerrito'},{code:'76250',name:'El Dovio'},{code:'76275',name:'Florida'},{code:'76306',name:'Ginebra'},{code:'76318',name:'Guacarí'},{code:'76364',name:'Jamundí'},{code:'76377',name:'La Cumbre'},{code:'76400',name:'La Unión'},{code:'76403',name:'La Victoria'},{code:'76497',name:'Obando'},{code:'76520',name:'Palmira'},{code:'76563',name:'Pradera'},{code:'76606',name:'Restrepo'},{code:'76616',name:'Riofrío'},{code:'76622',name:'Roldanillo'},{code:'76670',name:'San Pedro'},{code:'76736',name:'Sevilla'},{code:'76823',name:'Toro'},{code:'76828',name:'Trujillo'},{code:'76834',name:'Tuluá'},{code:'76845',name:'Ulloa'},{code:'76863',name:'Versalles'},{code:'76869',name:'Vijes'},{code:'76890',name:'Yotoco'},{code:'76892',name:'Yumbo'},{code:'76895',name:'Zarzal'}]},
+  { code:'97', name:'Vaupés', cities:[{code:'97001',name:'Mitú'},{code:'97161',name:'Carurú'},{code:'97511',name:'La Primavera'},{code:'97666',name:'Taraira'},{code:'97777',name:'Pacoa'},{code:'97889',name:'Yavaraté'}]},
+  { code:'99', name:'Vichada', cities:[{code:'99001',name:'Puerto Carreño'},{code:'99524',name:'La Primavera'},{code:'99624',name:'Santa Rosalía'},{code:'99773',name:'Cumaribo'}]}
+];
+
+// ─── Build department dropdown on load ───────────────────────────────────────
+function initDptoSelect() {
+  const sel = document.getElementById('f-dpto');
+  DANE.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d.name;
+    opt.dataset.code = d.code;
+    opt.textContent = d.name + ' (' + d.code + ')';
+    sel.appendChild(opt);
+  });
+}
+
+function onDptoChange() {
+  const dptoSel = document.getElementById('f-dpto');
+  const ciudadSel = document.getElementById('f-ciudad');
+  const hint = document.getElementById('dane-hint');
+  const selected = dptoSel.selectedOptions[0];
+  ciudadSel.innerHTML = '<option value="">— Seleccionar ciudad —</option>';
+  hint.style.display = 'none';
+  if (!selected || !selected.dataset.code) {
+    ciudadSel.disabled = true;
+    return;
+  }
+  const dpto = DANE.find(d => d.code === selected.dataset.code);
+  if (!dpto) return;
+  dpto.cities.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.code;
+    opt.textContent = c.name;
+    ciudadSel.appendChild(opt);
+  });
+  ciudadSel.disabled = false;
+}
+
+function onCiudadChange() {
+  const ciudadSel = document.getElementById('f-ciudad');
+  const dptoSel = document.getElementById('f-dpto');
+  const hint = document.getElementById('dane-hint');
+  const cityCode = ciudadSel.value;
+  const dptoCode = dptoSel.selectedOptions[0]?.dataset.code || '';
+  if (cityCode && dptoCode) {
+    hint.textContent = 'Dpto: ' + dptoCode + ' · Ciudad DANE: ' + cityCode;
+    hint.style.display = 'block';
+  } else {
+    hint.style.display = 'none';
+  }
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+initDptoSelect();
+updateCounts();
+</script>
+</body>
+</html>
