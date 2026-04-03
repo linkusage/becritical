@@ -1,1 +1,23 @@
-
+[
+  {
+    "consecutivo": 1711,
+    "tipo_comprobante": 2,
+    "identificacion_tercero": "8028804",
+    "fecha_elaboracion": "2026-04-03",
+    "identificacion_vendedor": "BE CRITICAL COFFEE S.A.S",
+    "items": [
+      {
+        "sku": "CHLA",
+        "producto": "Chiroso Lavado",
+        "presentacion": "340g",
+        "cantidad": 340,
+        "valor_unitario": 182.35294117647058,
+        "total": 62000
+      }
+    ],
+    "forma_pago": {
+      "codigo": 1,
+      "valor": 62000
+    }
+  }
+]
