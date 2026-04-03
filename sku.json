@@ -194,6 +194,11 @@
     "10k": 10000,
     "14k": 14000,
     "18k": 18000,
-    "Otro": 0
+    "Otro": 1
+  },
+  {
+    "SKU": "COWO",
+    "PRODUCTO": "Wompi",
+    "Comision": 1
   }
 ]
