@@ -1,13 +1,20 @@
 [
   {
-    "consecutivo": 1737,
+    "consecutivo": 1738,
     "fecha": "2026-04-04",
-    "tercero": "Ivan Parra",
-    "identificacion": "1066179716",
-    "productos": "RLAC 500g x500, BHO 250g x250, CGA 250g x250",
-    "domicilio": "Nacional Transportadora",
-    "total": 170000,
-    "forma_pago": "Efectivo",
-    "status": "Completado"
+    "tercero": "Luis Felipe Vasquez Jimenez",
+    "identificacion": "8028804",
+    "productos": "CHLA 500g x500",
+    "domicilio": "",
+    "total": 80000,
+    "forma_pago": "T. Débito",
+    "status": "En proceso",
+    "items_molienda": [
+      {
+        "sku": "CHLA",
+        "presentacion": "500g",
+        "molienda": "molido fino"
+      }
+    ]
   }
 ]
