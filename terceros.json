@@ -15377,5 +15377,18 @@
     "Teléfono de oficina contacto": null,
     "Teléfono móvil de contacto": "000-0000000-",
     "Estado": "Activo"
+  },
+  {
+    "Nombre tercero": "Valentina Jimenez Villegaz",
+    "Tipo de identificación": "13",
+    "Identificación": "1037666703",
+    "Dirección": "carrera 46 B # 43 S -20",
+    "Ciudad": "Envigado",
+    "Teléfono.": "3234140997",
+    "Correo electrónico": "jim-2899@hotmail.com",
+    "Nombres contacto": "Valentina",
+    "Teléfono de oficina contacto": null,
+    "Teléfono móvil de contacto": "3234140997",
+    "Estado": "Activo"
   }
 ]
