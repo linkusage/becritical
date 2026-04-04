@@ -1061,14 +1061,8 @@ async function cedulaVerify() {
 
   try {
     // Priority 1: in-memory terceros cache (zero network cost)
-    let existing = invTercerosCache;
-
-    // Priority 2: fetch from GH only if cache is empty
-    if (!existing) {
-      const file = await ghGet('terceros.json');
-      existing = file ? JSON.parse(ghB64Dec(file.content)) : [];
-      invTercerosCache = existing;
-    }
+    // Priority 2: invLoadTerceros() — tries raw public URL first, ghGet only as last resort
+    const existing = invTercerosCache || await invLoadTerceros();
 
     const isDup = existing.some(item =>
       String(item['Identificación'] || item.identificacion || '') === cedula
