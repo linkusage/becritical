@@ -1,19 +1,19 @@
 [
   {
-    "consecutivo": 1738,
+    "consecutivo": 1739,
     "fecha": "2026-04-04",
-    "tercero": "Luis Felipe Vasquez Jimenez",
-    "identificacion": "8028804",
-    "productos": "CHLA 500g x500",
-    "domicilio": "",
-    "total": 80000,
+    "tercero": "Sandra Liliana Uribe Velez",
+    "identificacion": "43264315",
+    "productos": "PANA 250g x250",
+    "domicilio": "Local Transportadora",
+    "total": 90300,
     "forma_pago": "T. Débito",
     "status": "En proceso",
     "items_molienda": [
       {
-        "sku": "CHLA",
-        "presentacion": "500g",
-        "molienda": "molido fino"
+        "sku": "PANA",
+        "presentacion": "250g",
+        "molienda": "molido medio"
       }
     ]
   }
