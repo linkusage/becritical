@@ -212,9 +212,9 @@
   {
     "SKU": "DOM",
     "PRODUCTO": "Domicilio",
-    "10k": 10000,
-    "14k": 14000,
-    "18k": 18000,
+    "Área metropolitana": 10000,
+    "Área metropolitana": 14000,
+    "Nacional": 18000,
     "Otro": 1
   },
   {
