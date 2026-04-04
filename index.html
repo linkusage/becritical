@@ -569,6 +569,39 @@ input[id^="inv-vu-"].dom-editable:focus { border-color: var(--accent) !important
 .td-green { color: var(--green); font-family: 'JetBrains Mono', monospace; font-weight: 700; }
 .td-chip.efectivo { background:rgba(16,185,129,.12); color:var(--green); border:1px solid rgba(16,185,129,.25); }
 .td-chip.credito  { background:rgba(79,110,247,.12); color:var(--accent); border:1px solid rgba(79,110,247,.25); }
+/* ── Cédula verify row ── */
+.cedula-check-row { display: flex; gap: .5rem; align-items: stretch; }
+.cedula-check-row input { flex: 1; min-width: 0; }
+#btn-check-cedula {
+  flex-shrink: 0;
+  padding: .6rem .875rem;
+  font-size: .78rem;
+  background: var(--surface2);
+  border: 1.5px solid var(--border2);
+  color: var(--text2);
+  border-radius: 9px;
+  font-family: 'Sora', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .18s;
+  white-space: nowrap;
+}
+#btn-check-cedula:hover:not(:disabled) { background: var(--surface3); color: var(--text); border-color: var(--accent); }
+#btn-check-cedula:disabled { opacity: .5; cursor: not-allowed; }
+#btn-check-cedula.state-valid   { border-color: var(--green); color: var(--green); background: rgba(5,150,105,.08); }
+#btn-check-cedula.state-dup     { border-color: var(--red);   color: var(--red);   background: rgba(220,38,38,.08); }
+#cedula-status {
+  font-size: .72rem; font-weight: 600; margin-top: .3rem;
+  min-height: 1rem; transition: color .2s;
+}
+#cedula-status.ok  { color: var(--green); }
+#cedula-status.err { color: var(--red); }
+#f-cedula.cedula-ok  { border-color: var(--green); box-shadow: 0 0 0 3px rgba(5,150,105,.12); }
+#f-cedula.cedula-dup { border-color: var(--red);   box-shadow: 0 0 0 3px rgba(220,38,38,.12); }
+@media (max-width: 700px) {
+  .cedula-check-row { flex-wrap: wrap; }
+  #btn-check-cedula { width: 100%; justify-content: center; }
+}
 </style>
 </head>
 <body>
@@ -624,7 +657,11 @@ input[id^="inv-vu-"].dom-editable:focus { border-color: var(--accent) !important
           </div>
           <div class="field">
             <label>Cédula / NIT <span class="req">*</span></label>
-            <input type="text" id="f-cedula" placeholder="Ej: 1098765432" autocomplete="off">
+            <div class="cedula-check-row">
+              <input type="text" id="f-cedula" placeholder="Ej: 1098765432" autocomplete="off" oninput="cedulaOnInput()">
+              <button type="button" id="btn-check-cedula" onclick="cedulaVerify()">🔎 Verificar</button>
+            </div>
+            <span id="cedula-status"></span>
           </div>
           <div class="field">
             <label>Tipo identificación <span class="req">*</span></label>
@@ -950,6 +987,106 @@ function splitName(fullName) {
   return { nombres: parts.slice(0, 2).join(' '), apellidos: parts.slice(2).join(' ') };
 }
 
+// ─── Cédula duplicate check ──────────────────────────────────────────────────
+// States: 'unchecked' | 'checking' | 'valid' | 'duplicate'
+let cedulaCheckState  = 'unchecked';
+let cedulaCheckedVal  = '';          // value that was last verified
+const cedulaCache     = {};          // { cedula: 'valid'|'duplicate' } — avoids re-queries
+
+function cedulaSetState(state, msg) {
+  cedulaCheckState = state;
+  const btn    = document.getElementById('btn-check-cedula');
+  const status = document.getElementById('cedula-status');
+  const input  = document.getElementById('f-cedula');
+  if (!btn || !status || !input) return;
+
+  // Reset classes
+  btn.classList.remove('state-valid', 'state-dup');
+  input.classList.remove('cedula-ok', 'cedula-dup');
+  status.className = 'cedula-status';
+  btn.disabled = false;
+
+  if (state === 'checking') {
+    btn.disabled = true;
+    btn.textContent = '⏳ Verificando…';
+    status.textContent = '';
+  } else if (state === 'valid') {
+    btn.textContent = '✅ Verificar';
+    btn.classList.add('state-valid');
+    input.classList.add('cedula-ok');
+    status.className = 'cedula-status ok';
+    status.textContent = '✔ Cédula disponible';
+  } else if (state === 'duplicate') {
+    btn.textContent = '🔎 Verificar';
+    btn.classList.add('state-dup');
+    input.classList.add('cedula-dup');
+    status.className = 'cedula-status err';
+    status.textContent = msg || '✖ Tercero ya existe';
+  } else {
+    // unchecked
+    btn.textContent = '🔎 Verificar';
+    status.textContent = '';
+  }
+}
+
+function cedulaOnInput() {
+  // Invalidate state if user edits the value after a check
+  if (cedulaCheckState !== 'unchecked') {
+    cedulaCheckState = 'unchecked';
+    cedulaCheckedVal = '';
+    const btn   = document.getElementById('btn-check-cedula');
+    const input = document.getElementById('f-cedula');
+    const status = document.getElementById('cedula-status');
+    if (btn)    { btn.textContent = '🔎 Verificar'; btn.classList.remove('state-valid','state-dup'); btn.disabled = false; }
+    if (input)  { input.classList.remove('cedula-ok','cedula-dup'); }
+    if (status) { status.textContent = ''; status.className = 'cedula-status'; }
+  }
+}
+
+async function cedulaVerify() {
+  const cedula = (document.getElementById('f-cedula')?.value || '').trim();
+  if (!cedula) { toast('Ingresa una cédula para verificar', 'err'); return; }
+
+  // Same value already verified — use cached result
+  if (cedula === cedulaCheckedVal && cedulaCheckState !== 'unchecked') return;
+
+  // Use frontend cache to avoid repeated network calls for same value
+  if (cedulaCache[cedula]) {
+    cedulaCheckedVal = cedula;
+    cedulaSetState(cedulaCache[cedula]);
+    return;
+  }
+
+  cedulaSetState('checking');
+
+  try {
+    // Priority 1: in-memory terceros cache (zero network cost)
+    let existing = invTercerosCache;
+
+    // Priority 2: fetch from GH only if cache is empty
+    if (!existing) {
+      const file = await ghGet('terceros.json');
+      existing = file ? JSON.parse(ghB64Dec(file.content)) : [];
+      invTercerosCache = existing;
+    }
+
+    const isDup = existing.some(item =>
+      String(item['Identificación'] || item.identificacion || '') === cedula
+    );
+
+    const result = isDup ? 'duplicate' : 'valid';
+    cedulaCache[cedula] = result;   // cache result for this value
+    cedulaCheckedVal = cedula;
+    cedulaSetState(result);
+  } catch(e) {
+    cedulaCheckState = 'unchecked';
+    cedulaCheckedVal = '';
+    const btn = document.getElementById('btn-check-cedula');
+    if (btn) { btn.textContent = '🔎 Verificar'; btn.disabled = false; }
+    toast('⚠️ Error al verificar cédula: ' + e.message, 'err');
+  }
+}
+
 // ─── Add client ───────────────────────────────────────────────────────────────
 async function addClient() {
   const nombre = document.getElementById('f-nombre').value.trim();
@@ -961,6 +1098,17 @@ async function addClient() {
   if (!cedula) { toast('La cédula / NIT es obligatoria', 'err'); return; }
   if (!correo) { toast('El correo es obligatorio', 'err'); return; }
   if (!celular) { toast('El celular es obligatorio', 'err'); return; }
+
+  // ── Cédula pre-check gate ────────────────────────────────────────────────────
+  if (cedulaCheckState === 'duplicate') {
+    toast('⚠️ Esta cédula ya existe. No se puede agregar.', 'err');
+    return;
+  }
+  if (cedulaCheckState !== 'valid') {
+    // User skipped verify — run it now as a blocking step
+    await cedulaVerify();
+    if (cedulaCheckState !== 'valid') return;  // stops if duplicate or error
+  }
 
   const unidad = document.getElementById('f-unidad').value.trim();
   const { nombres, apellidos } = splitName(nombre);
@@ -1007,7 +1155,10 @@ async function addClient() {
       String(item['Identificación'] || item.identificacion || '') === cedula
     );
     if (duplicate) {
-      alert('Tercero ya existe');
+      cedulaCache[cedula] = 'duplicate';
+      cedulaCheckedVal = cedula;
+      cedulaSetState('duplicate');
+      toast('⚠️ Tercero ya existe', 'err');
       return;
     }
 
@@ -1079,6 +1230,10 @@ function clearForm() {
   ciudadSel.innerHTML = '<option value="">— Primero selecciona un departamento —</option>';
   ciudadSel.disabled = true;
   document.getElementById('dane-hint').style.display = 'none';
+  // Reset cédula check state
+  cedulaCheckState = 'unchecked';
+  cedulaCheckedVal = '';
+  cedulaSetState('unchecked');
   // Reset edit mode
   window.editingClientIndex = undefined;
   const btnLabel = document.getElementById('btn-add-client');
