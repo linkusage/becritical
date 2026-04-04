@@ -8,7 +8,7 @@
     "domicilio": "Local Transportadora",
     "total": 90300,
     "forma_pago": "T. Débito",
-    "status": "En proceso",
+    "status": "Completado",
     "items_molienda": [
       {
         "sku": "PANA",
