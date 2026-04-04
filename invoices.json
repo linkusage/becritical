@@ -41,5 +41,39 @@
       "codigo": 3,
       "valor": 90300
     }
+  },
+  {
+    "consecutivo": 1740,
+    "tipo_comprobante": 2,
+    "identificacion_tercero": "1017220589",
+    "fecha_elaboracion": "2026-04-04",
+    "identificacion_vendedor": "901906362",
+    "items": [
+      {
+        "sku": "CMA",
+        "producto": "Cofermentado Maracuyá",
+        "presentacion": "100g",
+        "cantidad": 100,
+        "valor_unitario": 219.04761904761904,
+        "iva": 1095.2380952380952,
+        "iva_pct": 5,
+        "total": 23000
+      },
+      {
+        "sku": "DOM",
+        "producto": "Domicilio",
+        "presentacion": "Nacional Transportadora",
+        "cantidad": 1,
+        "valor_unitario": 18000,
+        "iva": 0,
+        "iva_pct": 0,
+        "total": 18000
+      }
+    ],
+    "iva_total": 1095.2380952380952,
+    "forma_pago": {
+      "codigo": 1,
+      "valor": 41000
+    }
   }
 ]
