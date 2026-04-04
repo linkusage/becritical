@@ -32,5 +32,39 @@
       "codigo": 3,
       "valor": 76000
     }
+  },
+  {
+    "consecutivo": 1734,
+    "tipo_comprobante": 2,
+    "identificacion_tercero": "8028804",
+    "fecha_elaboracion": "2026-04-03",
+    "identificacion_vendedor": "901906362",
+    "items": [
+      {
+        "sku": "RLAS",
+        "producto": "Regional Lavado SurOeste",
+        "presentacion": "500g",
+        "cantidad": 500,
+        "valor_unitario": 116,
+        "iva": 2761.904761904762,
+        "iva_pct": 5,
+        "total": 58000
+      },
+      {
+        "sku": "DOM",
+        "producto": "Domicilio",
+        "presentacion": "Nacional",
+        "cantidad": 1,
+        "valor_unitario": 18000,
+        "iva": 0,
+        "iva_pct": 0,
+        "total": 18000
+      }
+    ],
+    "iva_total": 2761.904761904762,
+    "forma_pago": {
+      "codigo": 3,
+      "valor": 76000
+    }
   }
 ]
