@@ -16,5 +16,23 @@
         "molienda": "molido medio"
       }
     ]
+  },
+  {
+    "consecutivo": 1740,
+    "fecha": "2026-04-04",
+    "tercero": "Julian Vasquez",
+    "identificacion": "1017220589",
+    "productos": "CMA 100g x100",
+    "domicilio": "Nacional Transportadora",
+    "total": 41000,
+    "forma_pago": "Efectivo",
+    "status": "En proceso",
+    "items_molienda": [
+      {
+        "sku": "CMA",
+        "presentacion": "100g",
+        "molienda": "grano"
+      }
+    ]
   }
 ]
