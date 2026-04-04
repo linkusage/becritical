@@ -15390,5 +15390,18 @@
     "Teléfono de oficina contacto": null,
     "Teléfono móvil de contacto": "3234140997",
     "Estado": "Activo"
+  },
+  {
+    "Nombre tercero": "Ivan Parra",
+    "Tipo de identificación": "13",
+    "Identificación": "1066179716",
+    "Dirección": "carrera 4 # 61. Barrio Lavalomo - Casa",
+    "Ciudad": "Chinú",
+    "Teléfono.": "3014062680",
+    "Correo electrónico": "jp_9011@hotmail.com",
+    "Nombres contacto": "Ivan",
+    "Teléfono de oficina contacto": null,
+    "Teléfono móvil de contacto": "3014062680",
+    "Estado": "Activo"
   }
 ]
