@@ -37,5 +37,18 @@
     "Teléfono de oficina contacto": null,
     "Teléfono móvil de contacto": "300123456789",
     "Estado": "Activo"
+  },
+  {
+    "Nombre tercero": "Pedro Perez",
+    "Tipo de identificación": "13",
+    "Identificación": "123456789123",
+    "Dirección": "calle # 10 - 20",
+    "Ciudad": "Medellín",
+    "Teléfono.": "30012345678",
+    "Correo electrónico": "p@p.com",
+    "Nombres contacto": "Pedro",
+    "Teléfono de oficina contacto": null,
+    "Teléfono móvil de contacto": "30012345678",
+    "Estado": "Activo"
   }
 ]
