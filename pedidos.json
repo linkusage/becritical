@@ -1,38 +1,13 @@
 [
   {
-    "consecutivo": 1739,
-    "fecha": "2026-04-04",
-    "tercero": "Sandra Liliana Uribe Velez",
-    "identificacion": "43264315",
-    "productos": "PANA 250g x250",
-    "domicilio": "Local Transportadora",
-    "total": 90300,
-    "forma_pago": "T. Débito",
-    "status": "Completado",
-    "items_molienda": [
-      {
-        "sku": "PANA",
-        "presentacion": "250g",
-        "molienda": "molido medio"
-      }
-    ]
-  },
-  {
-    "consecutivo": 1740,
-    "fecha": "2026-04-04",
-    "tercero": "Julian Vasquez",
-    "identificacion": "1017220589",
-    "productos": "CMA 100g x100",
+    "consecutivo": 1771,
+    "fecha": "2026-04-07",
+    "tercero": "Luis Roberto Jimenez Artera",
+    "identificacion": "1002011600",
+    "productos": "RLAC 500g x500",
     "domicilio": "Nacional Transportadora",
-    "total": 41000,
-    "forma_pago": "Efectivo",
-    "status": "Completado",
-    "items_molienda": [
-      {
-        "sku": "CMA",
-        "presentacion": "100g",
-        "molienda": "grano"
-      }
-    ]
+    "total": 76000,
+    "forma_pago": "T. Débito",
+    "status": "En proceso"
   }
 ]
