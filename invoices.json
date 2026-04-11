@@ -32,5 +32,29 @@
       "codigo": 3,
       "valor": 76000
     }
+  },
+  {
+    "consecutivo": 1772,
+    "tipo_comprobante": 2,
+    "identificacion_tercero": "437434343",
+    "fecha_elaboracion": "2026-04-10",
+    "identificacion_vendedor": "901906362",
+    "items": [
+      {
+        "sku": "RLAJ",
+        "producto": "Regional Lavado Jericó",
+        "presentacion": "250g",
+        "cantidad": 250,
+        "valor_unitario": 144.76190476190476,
+        "iva": 1809.5238095238096,
+        "iva_pct": 5,
+        "total": 38000
+      }
+    ],
+    "iva_total": 1809.5238095238096,
+    "forma_pago": {
+      "codigo": 1,
+      "valor": 38000
+    }
   }
 ]
