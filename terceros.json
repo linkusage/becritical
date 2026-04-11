@@ -15676,5 +15676,18 @@
     "Teléfono de oficina contacto": null,
     "Teléfono móvil de contacto": "3215503717",
     "Estado": "Activo"
+  },
+  {
+    "Nombre tercero": "Juan Felipe Parra Barrera",
+    "Tipo de identificación": "13",
+    "Identificación": "1020777792",
+    "Dirección": "Calle 147 #7B-58",
+    "Ciudad": "Bogotá D.C.",
+    "Teléfono.": "3168735709",
+    "Correo electrónico": "jfparrabarrera@gmail.com",
+    "Nombres contacto": "Juan Felipe",
+    "Teléfono de oficina contacto": null,
+    "Teléfono móvil de contacto": "3168735709",
+    "Estado": "Activo"
   }
 ]
