@@ -56,5 +56,29 @@
       "codigo": 3,
       "valor": 157000
     }
+  },
+  {
+    "consecutivo": 3,
+    "tipo_comprobante": 2,
+    "identificacion_tercero": "43264315",
+    "fecha_elaboracion": "2026-04-11",
+    "identificacion_vendedor": "901906362",
+    "items": [
+      {
+        "sku": "RLAA",
+        "producto": "Regional Lavado Andes",
+        "presentacion": "340g",
+        "cantidad": 340,
+        "valor_unitario": 131.65266106442579,
+        "iva": 2238.0952380952385,
+        "iva_pct": 5,
+        "total": 47000.00000000001
+      }
+    ],
+    "iva_total": 2238.0952380952385,
+    "forma_pago": {
+      "codigo": 3,
+      "valor": 47000.00000000001
+    }
   }
 ]
