@@ -15676,5 +15676,18 @@
     "Teléfono de oficina contacto": null,
     "Teléfono móvil de contacto": "3168735709",
     "Estado": "Activo"
+  },
+  {
+    "Nombre tercero": "Prueba",
+    "Tipo de identificación": "13",
+    "Identificación": "123456789123456789",
+    "Dirección": "CAlle 10 # 20 - 30",
+    "Ciudad": "Leticia",
+    "Teléfono.": "3123456789",
+    "Correo electrónico": "prueba@prueba.com",
+    "Nombres contacto": "Prueba",
+    "Teléfono de oficina contacto": null,
+    "Teléfono móvil de contacto": "3123456789",
+    "Estado": "Activo"
   }
 ]
