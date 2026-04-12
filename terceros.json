@@ -15676,5 +15676,18 @@
     "Teléfono de oficina contacto": null,
     "Teléfono móvil de contacto": "3168735709",
     "Estado": "Activo"
+  },
+  {
+    "Nombre tercero": "prueba",
+    "Tipo de identificación": "13",
+    "Identificación": "47385",
+    "Dirección": "AV 37 78 72 AP 103",
+    "Ciudad": "Arauquita",
+    "Teléfono.": "3215503717",
+    "Correo electrónico": "jvasqu19@gmail.com",
+    "Nombres contacto": "prueba",
+    "Teléfono de oficina contacto": null,
+    "Teléfono móvil de contacto": "3215503717",
+    "Estado": "Activo"
   }
 ]
