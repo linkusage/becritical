@@ -15676,5 +15676,20 @@
     "Teléfono de oficina contacto": null,
     "Teléfono móvil de contacto": "3168735709",
     "Estado": "Activo"
+  },
+  {
+    "Nombre tercero": "Jorge Romero",
+    "Tipo de identificación": "13",
+    "Identificación": "1067953783",
+    "Dirección": "Calle 11E #13-26 samaria dos",
+    "Ciudad": "Montería",
+    "Código departamento": "23",
+    "Código ciudad": "23001",
+    "Teléfono.": "3218911421",
+    "Correo electrónico": "jor-ge97@hotmail.com",
+    "Nombres contacto": "Jorge",
+    "Teléfono de oficina contacto": null,
+    "Teléfono móvil de contacto": "3218911421",
+    "Estado": "Activo"
   }
 ]
