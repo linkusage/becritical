@@ -1,16 +1,5 @@
 [
   {
-    "consecutivo": 1,
-    "fecha": "2026-04-10",
-    "tercero": "prueba",
-    "identificacion": "74845",
-    "productos": "RLAJ 340g x340",
-    "domicilio": "",
-    "total": 47000.00000000001,
-    "forma_pago": "Efectivo",
-    "status": "En proceso"
-  },
-  {
     "consecutivo": 2,
     "fecha": "2026-04-11",
     "tercero": "Juan Felipe Parra Barrera",
@@ -30,7 +19,7 @@
     "domicilio": "",
     "total": 47000.00000000001,
     "forma_pago": "T. Débito",
-    "status": "En proceso",
+    "status": "Completado",
     "items_molienda": [
       {
         "sku": "RLAA",
