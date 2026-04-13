@@ -15691,5 +15691,20 @@
     "Teléfono de oficina contacto": null,
     "Teléfono móvil de contacto": "3218911421",
     "Estado": "Activo"
+  },
+  {
+    "Nombre tercero": "HERNEY VARELA LENIS",
+    "Tipo de identificación": "13",
+    "Identificación": "1118294839",
+    "Dirección": "carrera 3 #13-65 casa",
+    "Ciudad": "Yumbo",
+    "Código departamento": "76",
+    "Código ciudad": "76892",
+    "Teléfono.": "3175847474",
+    "Correo electrónico": "varela.herney@gmail.com",
+    "Nombres contacto": "HERNEY",
+    "Teléfono de oficina contacto": null,
+    "Teléfono móvil de contacto": "3175847474",
+    "Estado": "Activo"
   }
 ]
