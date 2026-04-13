@@ -1,30 +1,29 @@
 [
   {
-    "consecutivo": 2,
-    "fecha": "2026-04-11",
-    "tercero": "Juan Felipe Parra Barrera",
-    "identificacion": "1020777792",
-    "productos": "BSIN 500g x500",
+    "consecutivo": 1800,
+    "fecha": "2026-04-12",
+    "tercero": "HERNEY VARELA LENIS",
+    "identificacion": "1118294839",
+    "productos": "SURU 100g x100, BSIN 100g x100, MNA 100g x100",
     "domicilio": "Nacional Transportadora",
-    "total": 157000,
+    "total": 131999.99999999997,
     "forma_pago": "T. Débito",
-    "status": "Completado"
-  },
-  {
-    "consecutivo": 3,
-    "fecha": "2026-04-11",
-    "tercero": "Sandra Liliana Uribe Velez",
-    "identificacion": "43264315",
-    "productos": "RLAA 340g x340",
-    "domicilio": "",
-    "total": 47000.00000000001,
-    "forma_pago": "T. Débito",
-    "status": "Completado",
+    "status": "En proceso",
     "items_molienda": [
       {
-        "sku": "RLAA",
-        "presentacion": "340g",
-        "molienda": "molido medio"
+        "sku": "SURU",
+        "presentacion": "100g",
+        "molienda": "grano"
+      },
+      {
+        "sku": "BSIN",
+        "presentacion": "100g",
+        "molienda": "grano"
+      },
+      {
+        "sku": "MNA",
+        "presentacion": "100g",
+        "molienda": "grano"
       }
     ]
   }
