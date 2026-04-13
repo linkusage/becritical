@@ -2,26 +2,36 @@
   {
     "consecutivo": 1800,
     "fecha": "2026-04-12",
-    "tercero": "HERNEY VARELA LENIS",
-    "identificacion": "1118294839",
-    "productos": "SURU 100g x100, BSIN 100g x100, MNA 100g x100",
+    "tercero": "Jorge Romero",
+    "identificacion": "1067953783",
+    "productos": "RLAC 100g x100, BNA 250g x250, CGA 100g x100, SURU 250g x250, CGA 100g x100",
     "domicilio": "Nacional Transportadora",
-    "total": 131999.99999999997,
+    "total": 199000,
     "forma_pago": "T. Débito",
     "status": "En proceso",
     "items_molienda": [
       {
+        "sku": "RLAC",
+        "presentacion": "100g",
+        "molienda": "grano"
+      },
+      {
+        "sku": "BNA",
+        "presentacion": "250g",
+        "molienda": "grano"
+      },
+      {
+        "sku": "CGA",
+        "presentacion": "100g",
+        "molienda": "grano"
+      },
+      {
         "sku": "SURU",
-        "presentacion": "100g",
+        "presentacion": "250g",
         "molienda": "grano"
       },
       {
-        "sku": "BSIN",
-        "presentacion": "100g",
-        "molienda": "grano"
-      },
-      {
-        "sku": "MNA",
+        "sku": "CGA",
         "presentacion": "100g",
         "molienda": "grano"
       }
