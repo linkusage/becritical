@@ -6773,19 +6773,6 @@
     "Estado": "Activo"
   },
   {
-    "Nombre tercero": "Ivan Parra",
-    "Tipo de identificación": "Cédula de ciudadanía",
-    "Identificación": "1066179716",
-    "Dirección": "carrera 4 # 61. Barrio Lavalomo - Casa",
-    "Ciudad": "Chinú",
-    "Teléfono.": "57-3014062680-",
-    "Correo electrónico": "jp_9011@hotmail.com",
-    "Nombres contacto": "Ivan Parra",
-    "Teléfono de oficina contacto": "57-3014062680-",
-    "Teléfono móvil de contacto": null,
-    "Estado": "Activo"
-  },
-  {
     "Nombre tercero": "Ivanna Piedad",
     "Tipo de identificación": "Cédula de ciudadanía",
     "Identificación": "1070592312",
@@ -15708,13 +15695,24 @@
     "Estado": "Activo"
   },
   {
+    "Nombre tercero": "Ivan Parra",
+    "Tipo de identificación": "13",
+    "Identificación": "1066179716",
+    "Dirección": "carrera 4 # 61. Barrio Lavalomo - Casa",
+    "Ciudad": "Chinú",
+    "Teléfono.": "3014062680",
+    "Correo electrónico": "jp_9011@hotmail.com",
+    "Nombres contacto": "Ivan",
+    "Teléfono de oficina contacto": null,
+    "Teléfono móvil de contacto": "3014062680",
+    "Estado": "Activo"
+  },
+  {
     "Nombre tercero": "Juan Carlos Perez",
     "Tipo de identificación": "13",
     "Identificación": "123456789123456789",
     "Dirección": "CAlle 10 # 20 - 30",
     "Ciudad": "Leticia",
-    "Código departamento": "91",
-    "Código ciudad": "91001",
     "Teléfono.": "3123456789",
     "Correo electrónico": "prueba@prueba.com",
     "Nombres contacto": "Juan",
